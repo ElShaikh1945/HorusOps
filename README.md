@@ -3,7 +3,7 @@
 <p align="center">
   <b>Production-Grade Git Automation, Server Process Orchestration, CI/CD Engine & Telegram AI Control Center</b>
   <br>
-  <a href="README.ar.md">🇸🇦 اقرأ هذا الدليل باللغة العربية</a>
+  <a href="README.ar.md">[AR] اقرأ هذا الدليل باللغة العربية</a>
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
 
 ---
 
-## 🌟 Overview
+## Overview
 
 **WAISoft-Reports** is an all-in-one DevOps and engineering companion designed to eliminate repetitive Git tasks, monitor local and remote servers, run build and CI/CD pipelines, and provide an intelligent **Telegram AI Operations Center** directly on your phone.
 
@@ -24,31 +24,31 @@ Whether you manage multiple development repositories, run background Next.js / N
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 1. 🤖 Telegram Operations & AI Diagnostics
+### 1. Telegram Operations & Automated Diagnostics
 - **14 Strict Slash Commands (No Underscores)**: Clean, user-friendly commands such as `/status`, `/diagnose`, `/managerreport`, `/servers`, `/server`, `/restart`, `/build`, `/sync`, `/repos`, and `/help`.
 - **Groq AI Integration**: Automated log diagnostics, root-cause analysis, and natural-language voice query understanding.
 - **Interactive Inline Keyboards**: One-tap server control, target build triggering, and diagnostic drills.
 - **Exact Timestamps**: Every command and status report outputs precise `HH:MM:SS` execution timestamps.
 - **Hardware & Disk Monitors**: Real-time tracking of CPU, RAM, and Disk space across macOS and Linux mount points.
 
-### 2. 🔄 Intelligent Git Multi-Repo Auto-Sync
+### 2. Automated Git Multi-Repo Synchronization
 - Scans base directories dynamically for Git repositories.
 - Detects uncommitted changes, stages files intelligently, and crafts contextual AI commit messages.
 - Pulls with `--rebase` and pushes to remote with detailed execution logs.
 
-### 3. 🖥️ Server Process Orchestrator (`servers.json`)
+### 3. Server Process Orchestrator (`servers.json`)
 - Manages local development servers (Next.js, Vite, Flask, FastAPI, Django, Express, etc.).
 - Active server tracking (`active_servers.json`) with PID management, port health checks, and automatic restart on crash.
 - Dynamic project discovery: Matches aliases, directories, and target port numbers.
 
-### 4. 🛠️ CI/CD Pipeline Engine (`targets.json`)
+### 4. CI/CD Pipeline Engine (`targets.json`)
 - Define local or remote build pipelines (e.g., Flutter release, Docker build, PyPI publish, npm test).
 - Pre-flight checks, dependency verification, and build artifact logging.
 - Instant Telegram notifications on pipeline success or failure with execution logs.
 
-### 5. 🌐 Zero-Dependency Web Setup Wizard (`setup_wizard.py`)
+### 5. Zero-Dependency Web Setup Console (`setup_wizard.py`)
 - Standalone single-file setup application running on standard Python libraries (`http.server`).
 - Modern, responsive Tailwind CSS UI accessible at `http://localhost:8585`.
 - **Live Connection Testers**:
@@ -60,7 +60,7 @@ Whether you manage multiple development repositories, run background Next.js / N
 
 ---
 
-## 📋 Quick Start
+## Quick Start
 
 ### 1. Clone the Repository
 ```bash
@@ -86,7 +86,7 @@ Open **`http://localhost:8585`** in your browser:
 
 ---
 
-## 🏃 Running the Bot & Services
+## Service Execution & Management
 
 ### Direct Execution
 Install dependencies:
@@ -128,7 +128,7 @@ For systemd-based Linux systems:
 
 ---
 
-## 🤖 Telegram Bot Commands Reference
+## Telegram Bot Commands Reference
 
 All commands follow strict syntax guidelines **without underscores**:
 
@@ -149,11 +149,11 @@ All commands follow strict syntax guidelines **without underscores**:
 | `/clearcache` | Clear temporary diagnostic caches and error logs | `/clearcache` |
 | `/help` | Display interactive command manual and usage tips | `/help` |
 
-> 💡 **Voice Commands**: Send a voice note to the bot! If Groq AI is enabled, the bot will transcribe the voice query and execute the corresponding command or answer intelligently.
+> **Voice Commands**: Send a voice note to the bot! If Groq AI is enabled, the bot will transcribe the voice query and execute the corresponding command or answer intelligently.
 
 ---
 
-## ⚙️ Configuration Details
+## Configuration Details
 
 ### 1. Environment Variables (`.env`)
 Copy `.env.example` to `.env` or use the Web Wizard:
@@ -220,7 +220,7 @@ Define automated build targets:
 
 ---
 
-## 🔒 Security & Privacy First
+## Security & Privacy Architecture
 
 - **Zero Hardcoded Secrets**: All tokens, keys, and IDs are isolated in `.env`, which is strictly excluded in `.gitignore`.
 - **Sandboxed Local Execution**: The bot runs entirely on your local machine or server. No intermediary proxy or telemetry server is contacted.
@@ -229,7 +229,7 @@ Define automated build targets:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome!
 Feel free to check [issues page](https://github.com/your-username/WAISoft-Reports/issues).
@@ -242,6 +242,6 @@ Feel free to check [issues page](https://github.com/your-username/WAISoft-Report
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

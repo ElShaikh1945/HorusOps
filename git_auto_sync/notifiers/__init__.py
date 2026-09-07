@@ -7,10 +7,10 @@ from git_auto_sync.notifiers.log import LogNotifier
 from git_auto_sync.notifiers.telegram import TelegramNotifier
 
 _STATUS_LABEL = {
-    "skipped": "⏭️ No changes",
-    "committed": "✅ Committed (not pushed)",
-    "committed_pushed": "🚀 Committed and pushed",
-    "failed": "❌ Failed",
+    "skipped": "[SKIP] No changes",
+    "committed": "[OK] Committed (not pushed)",
+    "committed_pushed": "[OK] Committed and pushed",
+    "failed": "[FAIL] Failed",
 }
 
 

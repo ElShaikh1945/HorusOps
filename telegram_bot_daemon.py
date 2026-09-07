@@ -69,8 +69,8 @@ from server_manager import PROJECT_ALIASES
 
 KEYBOARD = {
     "keyboard": [
-        [{"text": "📊 تقرير المدير"}, {"text": "ℹ️ المشاريع"}],
-        [{"text": "💾 حفظ (Commit)"}, {"text": "🚀 رفع (Push)"}],
+        [{"text": "تقرير الإنجاز"}, {"text": "المستودعات"}],
+        [{"text": "حفظ (Commit)"}, {"text": "رفع (Push)"}],
     ],
     "resize_keyboard": True,
     "persistent": True,
@@ -218,7 +218,7 @@ def set_bot_commands() -> None:
         {"command": "stop", "description": "إيقاف سيرفر محدد أو كافة السيرفرات"},
         {"command": "restart", "description": "إعادة تشغيل سريعة للسيرفرات مع تحديث الروابط"},
         {"command": "health", "description": "فحص صحة وموارد جهاز الماك (RAM, CPU, Disks)"},
-        {"command": "diagnose", "description": "تشخيص فوري للأخطاء بواسطة الذكاء الاصطناعي"},
+        {"command": "diagnose", "description": "فحص وتشخيص أخطاء السجلات والعمليات"},
         {"command": "build", "description": "بناء تطبيقات أندرويد واستلام ملفات الـ APK"},
         {"command": "report", "description": "إعداد التقرير الإداري اليومي للمدير"},
         {"command": "interval", "description": "ضبط الفاصل الزمني لمراقبة Actions (0 للحظي)"},
@@ -240,14 +240,14 @@ def make_build_inline_keyboard() -> dict:
     buttons = []
     for k, v in BUILD_TARGETS.items():
         title = v.get("title", k)
-        buttons.append([{"text": f"🔨 {title}", "callback_data": f"build:{k}"}])
-    buttons.append([{"text": "🔍 فلترة واختيار التطبيقات", "switch_inline_query_current_chat": "build "}])
+        buttons.append([{"text": f"[بناء] {title}", "callback_data": f"build:{k}"}])
+    buttons.append([{"text": "[بحث] فلترة واختيار التطبيقات", "switch_inline_query_current_chat": "build "}])
     return {"inline_keyboard": buttons}
 
 
 def make_server_inline_keyboard(action: str = "server") -> dict:
     verb = "إعادة تشغيل" if action == "restart" else "تشغيل"
-    icon = "🔄" if action == "restart" else "🚀"
+    icon = "[RESTART]" if action == "restart" else "[RUN]"
     buttons = []
     seen_projs = set()
     for skey, scfg in SERVER_CONFIGS.items():
@@ -258,7 +258,7 @@ def make_server_inline_keyboard(action: str = "server") -> dict:
             buttons.append([{"text": f"{icon} {verb} {title}", "callback_data": f"{action}:{proj}"}])
     if len(seen_projs) > 1 or not seen_projs:
         buttons.append([{"text": f"{icon} {verb} كافة المشاريع (All Projects)", "callback_data": f"{action}:all"}])
-    buttons.append([{"text": "🔍 فلترة واختيار المشروع", "switch_inline_query_current_chat": f"{action} "}])
+    buttons.append([{"text": "[بحث] فلترة واختيار المشروع", "switch_inline_query_current_chat": f"{action} "}])
     return {"inline_keyboard": buttons}
 
 
@@ -266,9 +266,9 @@ def make_stop_inline_keyboard() -> dict:
     active = get_all_active_project_servers()
     buttons = []
     for s in active:
-        buttons.append([{"text": f"🛑 إيقاف {s['title']} ({s['port']})", "callback_data": f"stop:{s['key']}"}])
+        buttons.append([{"text": f"[إيقاف] {s['title']} ({s['port']})", "callback_data": f"stop:{s['key']}"}])
     if len(active) > 1:
-        buttons.append([{"text": "🛑 إيقاف كافة السيرفرات (Stop All)", "callback_data": "stop:all"}])
+        buttons.append([{"text": "[إيقاف الكل] إيقاف كافة السيرفرات (Stop All)", "callback_data": "stop:all"}])
     return {"inline_keyboard": buttons}
 
 
@@ -283,8 +283,8 @@ def make_project_inline_keyboard(action_prefix: str) -> dict:
             row = []
     if row:
         buttons.append(row)
-    buttons.append([{"text": "📋 كافة المشاريع (شامل)", "callback_data": f"{action_prefix}:all"}])
-    buttons.append([{"text": "🔍 فلترة واختيار المشاريع", "switch_inline_query_current_chat": f"{action_prefix} "}])
+    buttons.append([{"text": "[شامل] كافة المشاريع", "callback_data": f"{action_prefix}:all"}])
+    buttons.append([{"text": "[بحث] فلترة واختيار المشاريع", "switch_inline_query_current_chat": f"{action_prefix} "}])
     return {"inline_keyboard": buttons}
 
 
@@ -537,9 +537,9 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
         if not repo_examples:
             repo_examples = "• /report <project_name>"
         menu_text = (
-            "📊 اختر المشروع المطلوب لإعداد تقرير الإنجاز اليومي:\n"
+            "[REPORT] اختر المشروع المطلوب لإعداد تقرير الإنجاز اليومي:\n"
             "(يحسب كافة الأعمال المنجزة منذ الساعة 3:00 فجراً)\n\n"
-            "💡 يمكنك الاختيار من الأزرار أدناه أو كتابة:\n"
+            "[NOTE] يمكنك الاختيار من الأزرار أدناه أو كتابة:\n"
             f"{repo_examples}\n"
             "• /report all — تقرير شامل لكافة المشاريع"
         )
@@ -553,7 +553,7 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
     if menu_msg_id:
         delete_telegram_message(chat_id, menu_msg_id)
 
-    init_res = send_telegram(chat_id, f"⏳ جاري إعداد التقرير الإداري اليومي ({target_project})...")
+    init_res = send_telegram(chat_id, f"[...] جاري إعداد التقرير الإداري اليومي ({target_project})...")
     progress_msg_id = init_res.get("result", {}).get("message_id")
 
     data, has_any, shift_label = get_daily_work_data()
@@ -564,13 +564,13 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
             if not filtered:
                 if progress_msg_id:
                     delete_telegram_message(chat_id, progress_msg_id)
-                send_telegram(chat_id, f"⚠️ لم يتم العثور على مشروع باسم {target_project}.")
+                send_telegram(chat_id, f"[WARN] لم يتم العثور على مشروع باسم {target_project}.")
                 return
             data = filtered
             has_any = any(d["has_activity"] for d in data)
             if not has_any:
                 reply = (
-                    f"ℹ️ مشروع {data[0]['name']}\n"
+                    f"[INFO] مشروع {data[0]['name']}\n"
                     f"لم تسجل فيه أي تعديلات أو أعمال اليوم ({shift_label})."
                 )
                 memory.save_turn(f"تقرير {target_project}", reply)
@@ -581,7 +581,7 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
         else:
             if not has_any:
                 reply = (
-                    f"ℹ️ تقرير اليوم الشامل\n"
+                    f"[INFO] تقرير اليوم الشامل\n"
                     f"لم تسجل أي تعديلات أو أعمال جديدة في كافة المشاريع اليوم ({shift_label})."
                 )
                 memory.save_turn("تقرير المدير الشامل", reply)
@@ -610,7 +610,7 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
         "1. ممنوع تماماً استخدام أي مصطلحات برمجية جافة (لا تذكر git, commit, branch, diff, hash, terminal).\n"
         "2. اكتب باختصار شديد وبشكل غير مخل: لخص ما تم إنجازه اليوم بنقاط عملية وواضحة (تحسينات الواجهة، إضافة صفحات، معالجة أخطاء، تجهيز بيئة العمل).\n"
         "3. التنسيق بدون أي علامات markdown معقدة (لا تستخدم أقواس أو نجوم):\n"
-        "📊 تقرير إنجاز الأعمال اليومية\n"
+        "[REPORT] تقرير إنجاز الأعمال اليومية\n"
         f"• دورة العمل: {shift_label}.\n"
         "• ملخص تنفيذي: سطر واحد موجز يوضح تقدم اليوم.\n"
         "• المشاريع المنجزة: اسم المشروع وتحته نقطتان أو ثلاث فقط توضح الأعمال المكتملة بلغة الأعمال.\n"
@@ -619,7 +619,7 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
 
     report = call_groq_ai(f"البيانات:\n{raw_summary}", system_prompt=system_prompt)
     if not report:
-        report = f"📊 تقرير الإنجاز اليومي ({shift_label}):\n\n" + raw_summary
+        report = f"[REPORT] تقرير الإنجاز اليومي ({shift_label}):\n\n" + raw_summary
 
     memory.save_turn(f"طلب تقرير {target_project}", report)
     if progress_msg_id:
@@ -637,10 +637,10 @@ def handle_status(chat_id: int, target_project: str | None = None, menu_msg_id: 
         t_clean = target_project.strip().lower()
         data = [d for d in data if d["name"].lower() == t_clean or t_clean in d["name"].lower()]
         if not data:
-            send_telegram(chat_id, f"⚠️ لم يتم العثور على مشروع باسم {target_project}.")
+            send_telegram(chat_id, f"[WARN] لم يتم العثور على مشروع باسم {target_project}.")
             return
 
-    lines = ["ℹ️ حالة المستودعات:", ""]
+    lines = ["[INFO] حالة المستودعات:", ""]
     for item in data:
         if item["is_dirty"]:
             details = []
@@ -649,9 +649,9 @@ def handle_status(chat_id: int, target_project: str | None = None, menu_msg_id: 
             if item["unpushed"]:
                 details.append(f"{len(item['unpushed'].splitlines())} غير مرفوعة")
             desc = ", ".join(details)
-            lines.append(f"• {item['name']} ({item['branch']}) ⚠️ [{desc}]")
+            lines.append(f"• {item['name']} ({item['branch']}) [WARN] [{desc}]")
         else:
-            lines.append(f"• {item['name']} ({item['branch']}) ✅ متزامن")
+            lines.append(f"• {item['name']} ({item['branch']}) [OK] متزامن")
     reply = "\n".join(lines)
     memory.save_turn("فحص الحالة", reply)
     send_telegram(chat_id, reply)
@@ -661,7 +661,7 @@ def handle_commit(chat_id: int, target_project: str | None = None, menu_msg_id: 
     if not target_project:
         send_telegram(
             chat_id,
-            "💾 اختر المشروع لحفظ تعديلاته محلياً (Commit):",
+            "[COMMIT] اختر المشروع لحفظ تعديلاته محلياً (Commit):",
             reply_markup=make_project_inline_keyboard("commit"),
         )
         return
@@ -669,7 +669,7 @@ def handle_commit(chat_id: int, target_project: str | None = None, menu_msg_id: 
     if menu_msg_id:
         delete_telegram_message(chat_id, menu_msg_id)
 
-    init_res = send_telegram(chat_id, f"⏳ جاري الحفظ محلياً ({target_project})...")
+    init_res = send_telegram(chat_id, f"[...] جاري الحفظ محلياً ({target_project})...")
     progress_msg_id = init_res.get("result", {}).get("message_id")
 
     from sync_engine import commit_local_changes_if_dirty
@@ -681,7 +681,7 @@ def handle_commit(chat_id: int, target_project: str | None = None, menu_msg_id: 
         if not repos:
             if progress_msg_id:
                 delete_telegram_message(chat_id, progress_msg_id)
-            send_telegram(chat_id, f"⚠️ لم يتم العثور على مشروع باسم {target_project}.")
+            send_telegram(chat_id, f"[WARN] لم يتم العثور على مشروع باسم {target_project}.")
             return
 
     results = []
@@ -693,9 +693,9 @@ def handle_commit(chat_id: int, target_project: str | None = None, menu_msg_id: 
             results.append(f"• {r.name}: خطأ ({msg})")
 
     if not results:
-        reply = "ℹ️ لا توجد أي تعديلات جديدة تحتاج للحفظ في المشروع المحدد."
+        reply = "[INFO] لا توجد أي تعديلات جديدة تحتاج للحفظ في المشروع المحدد."
     else:
-        reply = "💾 نتيجة الحفظ المحلي:\n" + "\n".join(results)
+        reply = "[COMMIT] نتيجة الحفظ المحلي:\n" + "\n".join(results)
 
     memory.save_turn("حفظ محلي", reply)
 
@@ -709,7 +709,7 @@ def handle_push(chat_id: int, target_project: str | None = None, menu_msg_id: in
     if not target_project:
         send_telegram(
             chat_id,
-            "🚀 اختر المشروع المطلوب رفعه إلى GitHub:",
+            "[START] اختر المشروع المطلوب رفعه إلى GitHub:",
             reply_markup=make_project_inline_keyboard("push"),
         )
         return
@@ -718,7 +718,7 @@ def handle_push(chat_id: int, target_project: str | None = None, menu_msg_id: in
         delete_telegram_message(chat_id, menu_msg_id)
 
     label = "كافة المشاريع" if target_project.lower() in {"all", "الكل"} else target_project
-    init_res = send_telegram(chat_id, f"⏳ جاري فحص ومزامنة ورفع ({label}) إلى GitHub...")
+    init_res = send_telegram(chat_id, f"[...] جاري فحص ومزامنة ورفع ({label}) إلى GitHub...")
     progress_msg_id = init_res.get("result", {}).get("message_id")
 
     result = execute_full_push(target_project)
@@ -727,13 +727,13 @@ def handle_push(chat_id: int, target_project: str | None = None, menu_msg_id: in
         delete_telegram_message(chat_id, progress_msg_id)
 
     if not result.get("ok"):
-        error_text = f"❌ تعذر الرفع:\n{result.get('error', 'خطأ غير معروف')}"
+        error_text = f"[ERROR] تعذر الرفع:\n{result.get('error', 'خطأ غير معروف')}"
         send_telegram(chat_id, error_text)
         return
 
     # Check for conflicts
     if result.get("has_conflicts"):
-        conflict_lines = ["🚨 تعارض في الدمج (Merge Conflict):"]
+        conflict_lines = ["[ALERT] تعارض في الدمج (Merge Conflict):"]
         for r in result["results"]:
             if r.get("status") == "conflict":
                 conflict_lines.append(f"• المشروع: {r['repo']}")
@@ -747,15 +747,15 @@ def handle_push(chat_id: int, target_project: str | None = None, menu_msg_id: in
     error_items = [r for r in result["results"] if r.get("status") == "error"]
 
     if not pushed_items and not error_items:
-        clean_text = f"✅ مشروع ({label}) متزامن بالفعل مع GitHub.\nلا توجد أي تعديلات جديدة للرفع."
+        clean_text = f"[OK] مشروع ({label}) متزامن بالفعل مع GitHub.\nلا توجد أي تعديلات جديدة للرفع."
         send_telegram(chat_id, clean_text)
         return
 
     resp_lines = []
     if pushed_items:
-        resp_lines.append("✅ تم الرفع بنجاح إلى GitHub\n")
+        resp_lines.append("[OK] تم الرفع بنجاح إلى GitHub\n")
         for p in pushed_items:
-            resp_lines.append(f"📦 مشروع: {p['repo']}")
+            resp_lines.append(f"[REPO] مشروع: {p['repo']}")
             resp_lines.append(f"• الـ Commit الجديد: {p['new_commit_hash']} - {p['new_commit_msg']}")
             if p.get("commit_url"):
                 resp_lines.append(f"• رابط الـ Commit: {p['commit_url']}")
@@ -768,7 +768,7 @@ def handle_push(chat_id: int, target_project: str | None = None, menu_msg_id: in
             resp_lines.append("")
 
     if error_items:
-        resp_lines.append("⚠️ أخطاء في بعض المشاريع:")
+        resp_lines.append("[WARN] أخطاء في بعض المشاريع:")
         for e in error_items:
             resp_lines.append(f"• {e['repo']}: {e.get('error')}")
 
@@ -791,7 +791,7 @@ def _async_build_worker(chat_id: int, target_key: str) -> None:
     try:
         cfg = BUILD_TARGETS[target_key]
         log(f"Starting async build worker for {target_key} ({cfg['title']})")
-        init_msg = send_telegram(chat_id, f"⏳ جاري إطلاق سير عمل GitHub Actions لبناء {cfg['title']} (arm64)...")
+        init_msg = send_telegram(chat_id, f"[...] جاري إطلاق سير عمل GitHub Actions لبناء {cfg['title']} (arm64)...")
         msg_id = init_msg.get("result", {}).get("message_id")
         start_ts = time.time()
 
@@ -800,19 +800,19 @@ def _async_build_worker(chat_id: int, target_key: str) -> None:
             log(f"Failed to trigger workflow for {target_key}: {err}")
             if msg_id:
                 delete_telegram_message(chat_id, msg_id)
-            send_telegram(chat_id, f"❌ فشل إطلاق الـ Workflow:\n{err}")
+            send_telegram(chat_id, f"[ERROR] فشل إطلاق الـ Workflow:\n{err}")
             return
 
         log(f"Workflow triggered successfully for {target_key}. Waiting for GitHub runner...")
         if msg_id:
-            edit_telegram_message(chat_id, msg_id, "⚙️ تم إطلاق سير العمل بنجاح.\nبانتظار التقاط الـ Run على خوادم GitHub Runners...")
+            edit_telegram_message(chat_id, msg_id, "[SYS] تم إطلاق سير العمل بنجاح.\nبانتظار التقاط الـ Run على خوادم GitHub Runners...")
 
         run = get_latest_run_id(cfg["owner"], cfg["repo"], cfg["workflow"], start_ts)
         if not run:
             log(f"Run was not captured within 1 minute for {target_key}")
             if msg_id:
                 delete_telegram_message(chat_id, msg_id)
-            send_telegram(chat_id, "⚠️ لم يتم رصد بدء الـ Run على خوادم GitHub خلال دقيقة واحدة. يرجى التحقق من تبويب Actions في المستودع.")
+            send_telegram(chat_id, "[WARN] لم يتم رصد بدء الـ Run على خوادم GitHub خلال دقيقة واحدة. يرجى التحقق من تبويب Actions في المستودع.")
             return
 
         run_id = run["id"]
@@ -820,17 +820,17 @@ def _async_build_worker(chat_id: int, target_key: str) -> None:
         log(f"Captured run {run_id} for {target_key}: {run_url}")
 
         def on_progress(status, elapsed, url, active_step, step_lines):
-            status_ar = "قيد التنفيذ ⏳" if status == "in_progress" else f"في الانتظار ({status})"
+            status_ar = "قيد التنفيذ [...]" if status == "in_progress" else f"في الانتظار ({status})"
             active_desc = active_step if active_step else "جاري معالجة المهام..."
             steps_block = "\n".join(step_lines) if step_lines else "• جاري استدعاء مراحل السير..."
             text = (
-                f"⚙️ جاري بناء {cfg['title']}...\n"
+                f"[SYS] جاري بناء {cfg['title']}...\n"
                 f"• المعمارية: arm64-v8a\n"
                 f"• الحالة: {status_ar} (المدة: {elapsed})\n"
                 f"• الخطوة الحالية: {active_desc}\n\n"
                 f"مراحل سير العمل (GitHub Actions):\n"
                 f"{steps_block}\n\n"
-                f"🔗 رابط السجلات الحية على GitHub:\n{url}"
+                f"[URL] رابط السجلات الحية على GitHub:\n{url}"
             )
             if msg_id:
                 edit_telegram_message(chat_id, msg_id, text)
@@ -851,7 +851,7 @@ def _async_build_worker(chat_id: int, target_key: str) -> None:
                     size_mb = round(apk.stat().st_size / (1024 * 1024), 1)
                     direct_apk_link = f"{direct_release_url}/{apk.name}"
                     caption = (
-                        f"📲 تطبيق جاهز للتثبيت والاستخدام:\n"
+                        f"[APP] تطبيق جاهز للتثبيت والاستخدام:\n"
                         f"• التطبيق: {cfg['title']}\n"
                         f"• الملف: {apk.name} ({size_mb} MB)\n"
                         f"• المعمارية: arm64-v8a\n"
@@ -864,18 +864,18 @@ def _async_build_worker(chat_id: int, target_key: str) -> None:
                     if not sent:
                         send_telegram(
                             chat_id,
-                            f"📲 تطبيق جاهز للتثبيت ({cfg['title']}):\n"
+                            f"[APP] تطبيق جاهز للتثبيت ({cfg['title']}):\n"
                             f"• الملف: {apk.name} ({size_mb} MB)\n"
                             f"• المعمارية: arm64-v8a\n"
                             f"• وضع البناء: Production Release\n\n"
-                            f"🔗 رابط التنزيل المباشر لملف الـ APK:\n{direct_apk_link}\n\n"
+                            f"[URL] رابط التنزيل المباشر لملف الـ APK:\n{direct_apk_link}\n\n"
                             f"رابط الـ Run على GitHub:\n{run_url}",
                         )
-                send_telegram(chat_id, "✅ تم إنجاز وتسليم ملفات الـ APK بنجاح. يمكنك الآن تثبيتها وتجربتها على هاتفك مباشرة.")
+                send_telegram(chat_id, "[OK] تم إنجاز وتسليم ملفات الـ APK بنجاح. يمكنك الآن تثبيتها وتجربتها على هاتفك مباشرة.")
             else:
                 send_telegram(
                     chat_id,
-                    f"✅ اكتمل البناء بنجاح ولكن لم يتم العثور على ملفات APK في الـ Artifacts.\nرابط الـ Run على GitHub:\n{run_url}",
+                    f"[OK] اكتمل البناء بنجاح ولكن لم يتم العثور على ملفات APK في الـ Artifacts.\nرابط الـ Run على GitHub:\n{run_url}",
                 )
         else:
             if msg_id:
@@ -883,26 +883,26 @@ def _async_build_worker(chat_id: int, target_key: str) -> None:
             failed_log = f"GitHub Actions workflow run failed with conclusion: {conclusion}.\nRun URL: {run_url}\nWorkflow: {cfg.get('workflow')}\nRepository: {cfg.get('owner')}/{cfg.get('repo')}"
             save_last_error(f"build_{target_key}", f"بناء أندرويد ({cfg['title']})", failed_log, reason=f"GitHub Actions Failed ({conclusion})")
             err_text = (
-                f"❌ فشل بناء تطبيق الأندرويد على GitHub Actions:\n"
+                f"[ERROR] فشل بناء تطبيق الأندرويد على GitHub Actions:\n"
                 f"• النتيجة: {conclusion}\n"
                 f"• رابط تفاصيل الخطأ على GitHub:\n{run_url}"
             )
-            diag_btn = {"inline_keyboard": [[{"text": "🤖 تشخيص الخطأ بالذكاء الاصطناعي", "callback_data": f"aidiag:build_{target_key}"}]]}
+            diag_btn = {"inline_keyboard": [[{"text": "[تشخيص سجل الخطأ]", "callback_data": f"aidiag:build_{target_key}"}]]}
             send_telegram(chat_id, err_text, reply_markup=diag_btn)
     except Exception as exc:
         import traceback
         log(f"Unexpected error in _async_build_worker for {target_key}: {traceback.format_exc()}")
-        send_telegram(chat_id, f"❌ حدث خطأ أثناء متابعة عملية البناء:\n{exc}")
+        send_telegram(chat_id, f"[ERROR] حدث خطأ أثناء متابعة عملية البناء:\n{exc}")
 
 
 def handle_build(chat_id: int, target: str | None = None, menu_msg_id: int | None = None) -> None:
     if not target:
         examples = "\n".join([f"• /build {k} — {v.get('title', k)}" for k, v in list(BUILD_TARGETS.items())[:3]])
         msg = (
-            "📱 بناء التطبيقات عبر GitHub Actions:\n\n"
+            "[APP] بناء التطبيقات عبر GitHub Actions:\n\n"
             "اختر الهدف المطلوب بناؤه عبر الأزرار أدناه، أو اكتب الأمر مباشرة:\n\n"
             f"{examples}\n\n"
-            "💡 يمكنك الضغط على زر الفلترة أدناه لاختيار أي هدف متوفر."
+            "[NOTE] يمكنك الضغط على زر الفلترة أدناه لاختيار أي هدف متوفر."
         )
         send_telegram(
             chat_id,
@@ -928,7 +928,7 @@ def handle_build(chat_id: int, target: str | None = None, menu_msg_id: int | Non
         opts = ", ".join(list(BUILD_TARGETS.keys()))
         send_telegram(
             chat_id,
-            f"⚠️ الهدف {target} غير معروف.\nالخيارات المتاحة: {opts}",
+            f"[WARN] الهدف {target} غير معروف.\nالخيارات المتاحة: {opts}",
             reply_markup=make_build_inline_keyboard(),
         )
         return
@@ -940,11 +940,11 @@ def handle_server(chat_id: int, target: str = "", menu_msg_id: int | None = None
     if not target:
         examples = "\n".join([f"• `/server {p}` — تشغيل {scfg.get('title', p)}" for p, scfg in list(SERVER_CONFIGS.items())[:3]])
         msg = (
-            "🚀 *تشغيل السيرفرات المحلية للمشاريع بالكامل:*\n\n"
+            "[START] *تشغيل السيرفرات المحلية للمشاريع بالكامل:*\n\n"
             "اختر المشروع المراد تشغيله من القائمة أدناه، أو اكتب الأمر مباشرة:\n\n"
             f"{examples}\n"
             "• `/server all` — تشغيل كافة السيرفرات دفعة واحدة\n\n"
-            "💡 *ملاحظة ذكية:* في حال كان المشروع أو أي جزء منه يعمل بالفعل على الجهاز (سواء عبر البوت أو من التيرمينال)، سيتم إعلامك فوراً بروابطه وتوقيت تشغيله ولن يتم تكرار تشغيله."
+            "[NOTE] *ملاحظة ذكية:* في حال كان المشروع أو أي جزء منه يعمل بالفعل على الجهاز (سواء عبر البوت أو من التيرمينال)، سيتم إعلامك فوراً بروابطه وتوقيت تشغيله ولن يتم تكرار تشغيله."
         )
         send_telegram(chat_id, msg, reply_markup=make_server_inline_keyboard("server"))
         return
@@ -956,7 +956,7 @@ def handle_server(chat_id: int, target: str = "", menu_msg_id: int | None = None
     if not services:
         send_telegram(
             chat_id,
-            f"⚠️ لم يتم التعرف على المشروع: {target}\nيرجى الاختيار من القائمة أدناه:",
+            f"[WARN] لم يتم التعرف على المشروع: {target}\nيرجى الاختيار من القائمة أدناه:",
             reply_markup=make_server_inline_keyboard("server"),
         )
         return
@@ -964,17 +964,17 @@ def handle_server(chat_id: int, target: str = "", menu_msg_id: int | None = None
     for svc in services:
         ok, info, err = start_service(svc)
         if not ok or not info:
-            send_telegram(chat_id, f"❌ فشل تشغيل {svc}:\n{err}")
+            send_telegram(chat_id, f"[ERROR] فشل تشغيل {svc}:\n{err}")
             continue
 
         if info.get("is_already_running"):
             send_telegram(
                 chat_id,
-                f"ℹ️ *{info.get('title')} يعمل بالفعل حالياً على الجهاز!*\n\n"
+                f"[INFO] *{info.get('title')} يعمل بالفعل حالياً على الجهاز!*\n\n"
                 f"⏱ *وقت البدء:* `{info.get('started_at')}`\n"
-                f"🔢 *البورت:* `{info.get('port')}` | *PID:* `{info.get('pid')}`\n"
-                f"🏷 *المصدر:* {info.get('source', 'مباشر من الجهاز')}\n\n"
-                f"🔗 *روابط الاستخدام:*\n"
+                f" *البورت:* `{info.get('port')}` | *PID:* `{info.get('pid')}`\n"
+                f" *المصدر:* {info.get('source', 'مباشر من الجهاز')}\n\n"
+                f"[URL] *روابط الاستخدام:*\n"
                 f"• *محلياً (Local):*\n  {info.get('local_url')}\n"
                 f"• *على نطاق الشبكة (LAN / Wi-Fi):*\n  {info.get('network_url')}"
             )
@@ -982,18 +982,18 @@ def handle_server(chat_id: int, target: str = "", menu_msg_id: int | None = None
 
         port_shift_note = ""
         if info.get("port_shifted"):
-            port_shift_note = f"⚠️ *ملاحظة ذكية:* البورت الافتراضي ({info.get('preferred_port')}) كان محجوزاً، وتم تحويل السيرفر تلقائياً إلى البورت المتاح: `{info.get('port')}`.\n\n"
+            port_shift_note = f"[WARN] *ملاحظة ذكية:* البورت الافتراضي ({info.get('preferred_port')}) كان محجوزاً، وتم تحويل السيرفر تلقائياً إلى البورت المتاح: `{info.get('port')}`.\n\n"
 
         msg = (
-            f"✅ *تم تشغيل السيرفر بنجاح!*\n\n"
+            f"[OK] *تم تشغيل السيرفر بنجاح!*\n\n"
             f"⏱ *توقيت التشغيل:* `{info.get('started_at')}`\n"
-            f"📌 *الخدمة:* {info.get('title')}\n"
-            f"🔢 *البورت:* `{info.get('port')}` | *PID:* `{info.get('pid')}`\n\n"
+            f" *الخدمة:* {info.get('title')}\n"
+            f" *البورت:* `{info.get('port')}` | *PID:* `{info.get('pid')}`\n\n"
             f"{port_shift_note}"
-            f"🔗 *روابط الاستخدام:*\n"
+            f"[URL] *روابط الاستخدام:*\n"
             f"• *محلياً (Local):*\n  {info.get('local_url')}\n"
             f"• *على نطاق الشبكة (LAN / Wi-Fi):*\n  {info.get('network_url')}\n\n"
-            f"📂 *ملف السجل (Logs):*\n`{info.get('log_file')}`"
+            f" *ملف السجل (Logs):*\n`{info.get('log_file')}`"
         )
         send_telegram(chat_id, msg)
 
@@ -1003,14 +1003,14 @@ def handle_servers_status(chat_id: int) -> None:
     if not active:
         send_telegram(
             chat_id,
-            "ℹ️ لا توجد أي سيرفرات نشطة حالياً لأي من المشاريع على الجهاز.",
+            "[INFO] لا توجد أي سيرفرات نشطة حالياً لأي من المشاريع على الجهاز.",
         )
         return
 
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    lines = [f"🖥️ *السيرفرات النشطة حالياً على الجهاز ({len(active)}):*\n"]
+    lines = [f"[SYSTEM] *السيرفرات النشطة حالياً على الجهاز ({len(active)}):*\n"]
     for s in active:
-        source_badge = f"🔹 *{s.get('title')}* — _{s.get('source', '')}_\n"
+        source_badge = f"- *{s.get('title')}* — _{s.get('source', '')}_\n"
         lines.append(
             f"{source_badge}"
             f"• وقت البدء: `{s.get('started_at')}`\n"
@@ -1027,9 +1027,9 @@ def handle_stop_server(chat_id: int, target: str = "", menu_msg_id: int | None =
     active = get_all_active_project_servers()
     if not target:
         if not active:
-            send_telegram(chat_id, "ℹ️ لا توجد أي سيرفرات نشطة حالياً على الجهاز لإيقافها.")
+            send_telegram(chat_id, "[INFO] لا توجد أي سيرفرات نشطة حالياً على الجهاز لإيقافها.")
             return
-        send_telegram(chat_id, "🛑 اختر السيرفر المراد إيقافه:", reply_markup=make_stop_inline_keyboard())
+        send_telegram(chat_id, "[STOP] اختر السيرفر المراد إيقافه:", reply_markup=make_stop_inline_keyboard())
         return
 
     if menu_msg_id:
@@ -1039,9 +1039,9 @@ def handle_stop_server(chat_id: int, target: str = "", menu_msg_id: int | None =
     if target_clean in {"all", "الكل", "كافة"}:
         results = stop_all_services()
         if not results:
-            send_telegram(chat_id, "ℹ️ لم تكن هناك أي سيرفرات نشطة على الجهاز.")
+            send_telegram(chat_id, "[INFO] لم تكن هناك أي سيرفرات نشطة على الجهاز.")
         else:
-            send_telegram(chat_id, "🛑 *نتائج الإيقاف الشامل:*\n\n" + "\n".join(f"• {r}" for r in results))
+            send_telegram(chat_id, "[STOP] *نتائج الإيقاف الشامل:*\n\n" + "\n".join(f"• {r}" for r in results))
         return
 
     services = resolve_services_from_input(target_clean)
@@ -1052,12 +1052,12 @@ def handle_stop_server(chat_id: int, target: str = "", menu_msg_id: int | None =
                 break
 
     if not services:
-        send_telegram(chat_id, f"⚠️ لم يتم العثور على سيرفر نشط يطابق: {target}")
+        send_telegram(chat_id, f"[WARN] لم يتم العثور على سيرفر نشط يطابق: {target}")
         return
 
     for svc in services:
         ok, msg = stop_service(svc)
-        send_telegram(chat_id, ("✅ " if ok else "❌ ") + msg)
+        send_telegram(chat_id, ("[OK] " if ok else "[ERROR] ") + msg)
 
 
 def server_monitor_worker() -> None:
@@ -1068,18 +1068,18 @@ def server_monitor_worker() -> None:
             crashed = check_and_cleanup_crashes()
             for c in crashed:
                 err_tail = c.get("error_snippet", "").strip()
-                tail_section = f"\n\n📄 *آخر أسطر من السجل (Error Log):*\n```\n{err_tail}\n```" if err_tail else ""
+                tail_section = f"\n\n *آخر أسطر من السجل (Error Log):*\n```\n{err_tail}\n```" if err_tail else ""
                 alert_msg = (
-                    f"⚠️ *تنبيه طارئ: توقف سيرفر محلي بشكل مفاجئ!*\n\n"
+                    f"[WARN] *تنبيه طارئ: توقف سيرفر محلي بشكل مفاجئ!*\n\n"
                     f"⏱ *توقيت الرصد:* `{c.get('detected_at')}`\n"
-                    f"📌 *السيرفر:* {c.get('title')}\n"
-                    f"🔢 *البورت:* `{c.get('port')}` | *PID:* `{c.get('pid')}`\n"
-                    f"🛑 *سبب التوقف:* {c.get('reason')}"
+                    f" *السيرفر:* {c.get('title')}\n"
+                    f" *البورت:* `{c.get('port')}` | *PID:* `{c.get('pid')}`\n"
+                    f"[STOP] *سبب التوقف:* {c.get('reason')}"
                     f"{tail_section}\n\n"
-                    f"💡 تم تنظيف وحذف السيرفر من قائمة السيرفرات النشطة. لإعادة تشغيله اكتب: `/server {c.get('key')}`"
+                    f"[NOTE] تم تنظيف وحذف السيرفر من قائمة السيرفرات النشطة. لإعادة تشغيله اكتب: `/server {c.get('key')}`"
                 )
                 if AUTHORIZED_USER_ID:
-                    diag_btn = {"inline_keyboard": [[{"text": "🤖 تشخيص الخطأ بالذكاء الاصطناعي", "callback_data": f"aidiag:{c.get('key')}"}]]}
+                    diag_btn = {"inline_keyboard": [[{"text": "[تشخيص سجل الخطأ]", "callback_data": f"aidiag:{c.get('key')}"}]]}
                     send_telegram(AUTHORIZED_USER_ID, alert_msg, reply_markup=diag_btn)
         except Exception as e:
             log(f"Error in server_monitor_worker: {e}")
@@ -1091,7 +1091,7 @@ def handle_restart(chat_id: int, target: str = "", menu_msg_id: int | None = Non
     if not target:
         examples = "\n".join([f"• `/restart {p}` — إعادة تشغيل {scfg.get('title', p)}" for p, scfg in list(SERVER_CONFIGS.items())[:3]])
         msg = (
-            "🔄 *إعادة التشغيل السريع للسيرفرات المحلية:*\n\n"
+            "[RESTART] *إعادة التشغيل السريع للسيرفرات المحلية:*\n\n"
             "اختر المشروع المراد إعادة تشغيله (إيقاف أنيق، تحرير البورتات، وإعادة إطلاق فورية):\n\n"
             f"{examples}\n"
             "• `/restart all` — إعادة تشغيل كافة السيرفرات دفعة واحدة"
@@ -1104,31 +1104,31 @@ def handle_restart(chat_id: int, target: str = "", menu_msg_id: int | None = Non
 
     services = resolve_services_from_input(target)
     if not services:
-        send_telegram(chat_id, f"⚠️ لم يتم التعرف على المشروع: {target}")
+        send_telegram(chat_id, f"[WARN] لم يتم التعرف على المشروع: {target}")
         return
 
-    send_telegram(chat_id, f"⏳ جاري إعادة تشغيل {target} (إيقاف وتحرير البورتات ثم إعادة الإطلاق)...")
+    send_telegram(chat_id, f"[...] جاري إعادة تشغيل {target} (إيقاف وتحرير البورتات ثم إعادة الإطلاق)...")
 
     for svc in services:
         ok, info, stop_msg = restart_service(svc)
         if not ok or not info:
-            send_telegram(chat_id, f"❌ فشل إعادة تشغيل {svc}:\n{stop_msg}")
+            send_telegram(chat_id, f"[ERROR] فشل إعادة تشغيل {svc}:\n{stop_msg}")
             continue
 
         port_shift_note = ""
         if info.get("port_shifted"):
-            port_shift_note = f"⚠️ *ملاحظة ذكية:* تم التحويل للبورت المتاح: `{info.get('port')}`.\n\n"
+            port_shift_note = f"[WARN] *ملاحظة ذكية:* تم التحويل للبورت المتاح: `{info.get('port')}`.\n\n"
 
         msg = (
-            f"🔄 *تم إعادة تشغيل السيرفر بنجاح!*\n\n"
-            f"📌 *الخدمة:* {info.get('title')}\n"
-            f"🔢 *البورت:* `{info.get('port')}` | *PID:* `{info.get('pid')}`\n"
+            f"[RESTART] *تم إعادة تشغيل السيرفر بنجاح!*\n\n"
+            f" *الخدمة:* {info.get('title')}\n"
+            f" *البورت:* `{info.get('port')}` | *PID:* `{info.get('pid')}`\n"
             f"⏱ *توقيت التشغيل الجديد:* `{info.get('started_at')}`\n\n"
             f"{port_shift_note}"
-            f"🔗 *روابط الاستخدام:*\n"
+            f"[URL] *روابط الاستخدام:*\n"
             f"• *محلياً (Local):*\n  {info.get('local_url')}\n"
             f"• *على نطاق الشبكة (LAN / Wi-Fi):*\n  {info.get('network_url')}\n\n"
-            f"📂 *ملف السجل (Logs):*\n`{info.get('log_file')}`"
+            f" *ملف السجل (Logs):*\n`{info.get('log_file')}`"
         )
         send_telegram(chat_id, msg)
 
@@ -1142,15 +1142,15 @@ def handle_health(chat_id: int) -> None:
     disks_str = "\n".join(disks_lines) if disks_lines else "• غير متاح"
 
     msg = (
-        f"🖥️ *تقرير صحة وموارد جهاز الماك (System Health):*\n\n"
-        f"🧠 *الذاكرة العشوائية (RAM):*\n"
+        f"[SYSTEM] *تقرير صحة وموارد جهاز الماك (System Health):*\n\n"
+        f" *الذاكرة العشوائية (RAM):*\n"
         f"• المستخدم الفعلي: `{h['used_ram_gb']} GB` من `{h['total_ram_gb']} GB` ({h['ram_percent']}%)\n\n"
-        f"⚙️ *المعالج (CPU):*\n"
+        f"[SYS] *المعالج (CPU):*\n"
         f"• الحمل الحالي: `{h['cpu_percent']}%` ({h['ncpu']} Cores)\n"
         f"• متوسط الحمل (Load Avg): `{h['load_str']}`\n\n"
-        f"💾 *سعة التخزين (Disks):*\n{disks_str}\n\n"
+        f"[COMMIT] *سعة التخزين (Disks):*\n{disks_str}\n\n"
         f"⏱ *مدة تشغيل الجهاز (Uptime):* {h['uptime']}\n"
-        f"🚀 *السيرفرات النشطة حالياً:* {h['active_servers_count']} سيرفر(ات)\n\n"
+        f"[START] *السيرفرات النشطة حالياً:* {h['active_servers_count']} سيرفر(ات)\n\n"
         f"⏱ *توقيت الفحص:* `{h['timestamp']}`"
     )
     send_telegram(chat_id, msg)
@@ -1164,10 +1164,10 @@ def handle_ai_diagnose(chat_id: int, target: str = "") -> None:
         err_info = get_last_error("")
 
     if not err_info or not err_info.get("snippet"):
-        send_telegram(chat_id, "ℹ️ لا توجد سجلات أخطاء حديثة مسجلة حالياً لتحليلها بالذكاء الاصطناعي.")
+        send_telegram(chat_id, "[INFO] لا توجد سجلات أخطاء حديثة مسجلة حالياً.")
         return
 
-    wait_msg = send_telegram(chat_id, f"🤖 *جاري تشخيص الخطأ بواسطة الذكاء الاصطناعي لـ:* {err_info.get('title')}...")
+    wait_msg = send_telegram(chat_id, f"[*] جاري فحص وتشخيص السجل لـ: {err_info.get('title')}...")
     wait_id = wait_msg.get("result", {}).get("message_id") if wait_msg else None
 
     prompt = (
@@ -1177,21 +1177,21 @@ def handle_ai_diagnose(chat_id: int, target: str = "") -> None:
         f"• سبب التوقف المرصود: {err_info.get('reason')}\n"
         f"• سجل الأخطاء الأخير:\n```\n{err_info.get('snippet')}\n```\n\n"
         f"المطلوب تقديم تحليل موجز جداً، احترافي، ومباشر باللغة العربية بالتنسيق التالي:\n"
-        f"1. 🔍 *السبب الجذري (Root Cause):* سطرين لشرح المشكلة بدقة دون تعقيد.\n"
-        f"2. 📍 *موقع الخطأ (Location):* اسم الملف والسطر إن توفر في السجل.\n"
-        f"3. 🛠 *الحل المقترح (Recommended Fix):* الأمر أو الخطوات الدقيقة لتصحيح المشكلة فوراً."
+        f"1. [FIND] *السبب الجذري (Root Cause):* سطرين لشرح المشكلة بدقة دون تعقيد.\n"
+        f"2.  *موقع الخطأ (Location):* اسم الملف والسطر إن توفر في السجل.\n"
+        f"3. [FIX] *الحل المقترح (Recommended Fix):* الأمر أو الخطوات الدقيقة لتصحيح المشكلة فوراً."
     )
 
-    reply = call_groq_ai(prompt, system_prompt="أنت خبير DevOps وتشخيص أخطاء محترف. ردودك مباشرة وعملية وموجزة وخالية من الحشو.")
+    reply = call_groq_ai(prompt, system_prompt="أنت محرك تشخيص أخطاء تقني (Diagnostic Engine). ردك تقني، مباشر، موجز، وخالٍ تماماً من أي إيموجيز أو مقدمات أو عبارات ترحيبية. ممنوع أن تظهر كشات أو مساعد ذكي.")
     if wait_id:
         delete_telegram_message(chat_id, wait_id)
 
     if not reply:
-        reply = "تعذر الحصول على تشخيص الذكاء الاصطناعي حالياً بسبب ضغط الشبكة."
+        reply = "[ERROR] تعذر فحص السجل حالياً بسبب تعذر الاتصال بمحرك التحليل."
 
     header = (
-        f"🩺 *تقرير تشخيص الخطأ بالذكاء الاصطناعي (AI Diagnostics):*\n\n"
-        f"📌 *الخدمة:* {err_info.get('title')}\n"
+        f"--- DIAGNOSTIC REPORT ---\n\n"
+        f" *الخدمة:* {err_info.get('title')}\n"
         f"⏱ *توقيت الخطأ:* `{err_info.get('timestamp')}`\n\n"
     )
     send_telegram(chat_id, header + reply)
@@ -1301,13 +1301,13 @@ def git_remote_monitor_worker() -> None:
             alerts = check_git_remote_ahead()
             for a in alerts:
                 msg = (
-                    f"📢 *تنبيه: تحديثات جديدة في المستودع البعيد (Remote Updates)!*\n\n"
-                    f"📁 *المشروع:* `{a['repo']}`\n"
-                    f"🌿 *الفرع النشط:* `{a['branch']}`\n"
-                    f"🔢 *عدد التعديلات الجديدة:* {a['ahead_count']} Commit(s)\n\n"
-                    f"📝 *آخر التعديلات:*\n{a['log_summary']}\n\n"
+                    f"[REMOTE] *تنبيه: تحديثات جديدة في المستودع البعيد (Remote Updates)!*\n\n"
+                    f" *المشروع:* `{a['repo']}`\n"
+                    f" *الفرع النشط:* `{a['branch']}`\n"
+                    f" *عدد التعديلات الجديدة:* {a['ahead_count']} Commit(s)\n\n"
+                    f" *آخر التعديلات:*\n{a['log_summary']}\n\n"
                     f"⏱ *توقيت الرصد:* `{a['timestamp']}`\n"
-                    f"💡 للمزامنة الفورية اكتب: `/push {a['repo']}` أو اسحب التعديلات (git pull) من جهازك."
+                    f"[NOTE] للمزامنة الفورية اكتب: `/push {a['repo']}` أو اسحب التعديلات (git pull) من جهازك."
                 )
                 if AUTHORIZED_USER_ID:
                     send_telegram(AUTHORIZED_USER_ID, msg)
@@ -1392,10 +1392,10 @@ def check_git_local_activity(state: dict, is_initial: bool = False) -> tuple[dic
                     "remote_ref": remote_ref,
                 }
                 alerts.append(
-                    f"🌿 *تغيير الفرع النشط في المشروع (Git Branch):*\n\n"
-                    f"📁 *المشروع:* `{repo_name}`\n"
-                    f"🔀 *الفرع الجديد:* `{branch}`\n"
-                    f"🔙 *الفرع السابق:* `{old_branch}`\n"
+                    f" *تغيير الفرع النشط في المشروع (Git Branch):*\n\n"
+                    f" *المشروع:* `{repo_name}`\n"
+                    f" *الفرع الجديد:* `{branch}`\n"
+                    f" *الفرع السابق:* `{old_branch}`\n"
                     f"⏱ *توقيت التغيير:* `{now_str}`"
                 )
                 continue
@@ -1442,14 +1442,14 @@ def check_git_local_activity(state: dict, is_initial: bool = False) -> tuple[dic
                                 pass
 
                         _, commit_url = get_github_urls(r, "origin", branch, remote_ref[:8])
-                        url_section = f"\n🔗 [عرض التعديلات على GitHub]({commit_url})" if commit_url else ""
+                        url_section = f"\n[URL] [عرض التعديلات على GitHub]({commit_url})" if commit_url else ""
 
                         alerts.append(
-                            f"🚀 *تم رفع تعديلات إلى GitHub (Git Push من الجهاز):*\n\n"
-                            f"📁 *المشروع:* `{repo_name}`\n"
-                            f"🌿 *الفرع:* `{branch}`\n"
-                            f"🔢 *عدد التعديلات المرفوعة:* {pushed_count} Commit(s)\n\n"
-                            f"📝 *التعديلات:*\n{log_summary}\n\n"
+                            f"[START] *تم رفع تعديلات إلى GitHub (Git Push من الجهاز):*\n\n"
+                            f" *المشروع:* `{repo_name}`\n"
+                            f" *الفرع:* `{branch}`\n"
+                            f" *عدد التعديلات المرفوعة:* {pushed_count} Commit(s)\n\n"
+                            f" *التعديلات:*\n{log_summary}\n\n"
                             f"⏱ *توقيت الرفع:* `{now_str}`"
                             f"{url_section}"
                         )
@@ -1467,10 +1467,10 @@ def check_git_local_activity(state: dict, is_initial: bool = False) -> tuple[dic
                     except Exception:
                         pass
                     alerts.append(
-                        f"📥 *تم سحب وتحديث الكود محلياً (Git Pull من الجهاز):*\n\n"
-                        f"📁 *المشروع:* `{repo_name}`\n"
-                        f"🌿 *الفرع:* `{branch}`\n"
-                        f"📝 *آخر تحديث مدمج:*\n{pull_summary}\n\n"
+                        f"[PULL] *تم سحب وتحديث الكود محلياً (Git Pull من الجهاز):*\n\n"
+                        f" *المشروع:* `{repo_name}`\n"
+                        f" *الفرع:* `{branch}`\n"
+                        f" *آخر تحديث مدمج:*\n{pull_summary}\n\n"
                         f"⏱ *توقيت السحب:* `{now_str}`"
                     )
                 else:
@@ -1501,13 +1501,13 @@ def check_git_local_activity(state: dict, is_initial: bool = False) -> tuple[dic
                                 pass
 
                         alerts.append(
-                            f"💾 *تم تسجيل حفظ محلي جديد (Git Commit من الجهاز):*\n\n"
-                            f"📁 *المشروع:* `{repo_name}`\n"
-                            f"🌿 *الفرع:* `{branch}`\n"
-                            f"🔢 *العدد:* {commit_count} Commit(s)\n\n"
-                            f"📝 *تفاصيل الحفظ:*\n{commit_summary}\n\n"
+                            f"[COMMIT] *تم تسجيل حفظ محلي جديد (Git Commit من الجهاز):*\n\n"
+                            f" *المشروع:* `{repo_name}`\n"
+                            f" *الفرع:* `{branch}`\n"
+                            f" *العدد:* {commit_count} Commit(s)\n\n"
+                            f" *تفاصيل الحفظ:*\n{commit_summary}\n\n"
                             f"⏱ *توقيت الحفظ:* `{now_str}`\n"
-                            f"💡 لرفع التعديل إلى GitHub يمكنك كتابة: `/push {repo_name}` أو تشغيل `git push` من جهازك."
+                            f"[NOTE] لرفع التعديل إلى GitHub يمكنك كتابة: `/push {repo_name}` أو تشغيل `git push` من جهازك."
                         )
                 prev["head"] = head
 
@@ -1648,15 +1648,15 @@ def actions_monitor_worker() -> None:
                         state[run_key] = {"status": status, "conclusion": conclusion}
                         save_actions_state(state)
 
-                        status_ar = "قيد التنفيذ ⏳" if status == "in_progress" else f"في الانتظار ({status})"
+                        status_ar = "قيد التنفيذ [...]" if status == "in_progress" else f"في الانتظار ({status})"
                         msg = (
-                            f"⚙️ *بدء تشغيل سير عمل جديد على GitHub Actions:*\n"
+                            f"[SYS] *بدء تشغيل سير عمل جديد على GitHub Actions:*\n"
                             f"• المشروع: *{local_name}* (`{owner}/{rname}`)\n"
                             f"• السير (Workflow): *{wf_name}*\n"
                             f"• الفرع: `{branch}`\n"
                             f"• الحدث: `{event}`\n"
                             f"• الحالة: {status_ar}\n\n"
-                            f"🔗 [متابعة السجلات الحية على GitHub]({html_url})"
+                            f"[URL] [متابعة السجلات الحية على GitHub]({html_url})"
                         )
                         send_telegram(AUTHORIZED_USER_ID, msg)
 
@@ -1666,7 +1666,7 @@ def actions_monitor_worker() -> None:
                         save_actions_state(state)
 
                         if status == "completed":
-                            icon = "✅" if conclusion == "success" else "❌"
+                            icon = "[OK]" if conclusion == "success" else "[ERROR]"
                             concl_ar = "اكتمل بنجاح" if conclusion == "success" else f"فشل ({conclusion})"
 
                             created_at = run.get("created_at")
@@ -1687,7 +1687,7 @@ def actions_monitor_worker() -> None:
                                 f"• السير (Workflow): *{wf_name}*\n"
                                 f"• الفرع: `{branch}`\n"
                                 f"• النتيجة: *{concl_ar}*{dur_str}\n\n"
-                                f"🔗 [عرض تفاصيل الـ Run على GitHub]({html_url})"
+                                f"[URL] [عرض تفاصيل الـ Run على GitHub]({html_url})"
                             )
                             send_telegram(AUTHORIZED_USER_ID, msg)
 
@@ -1696,7 +1696,7 @@ def actions_monitor_worker() -> None:
                                 for apk in apks:
                                     size_mb = round(apk.stat().st_size / (1024 * 1024), 1)
                                     caption = (
-                                        f"📲 *تطبيق أندرويد جاهز للتثبيت والمعاينة:*\n"
+                                        f"[APP] *تطبيق أندرويد جاهز للتثبيت والمعاينة:*\n"
                                         f"• الملف: `{apk.name}` ({size_mb} MB)\n"
                                         f"• المعمارية: `arm64-v8a`\n"
                                         f"• المشروع: `{local_name}`\n"
@@ -1706,7 +1706,7 @@ def actions_monitor_worker() -> None:
                                     if not sent:
                                         send_telegram(
                                             AUTHORIZED_USER_ID,
-                                            f"⚠️ ملف `{apk.name}` جاهز ({size_mb} MB)، يمكنك تحميله من [رابط الـ Artifact على GitHub]({html_url}).",
+                                            f"[WARN] ملف `{apk.name}` جاهز ({size_mb} MB)، يمكنك تحميله من [رابط الـ Artifact على GitHub]({html_url}).",
                                         )
 
                     time.sleep(0.3)
@@ -1726,7 +1726,7 @@ def handle_interval(chat_id: int, arg: str = "") -> None:
     current_interval = cfg.get("actions_interval", 30)
 
     if not arg:
-        status_desc = "⚡ الوضع اللحظي (فحص فوري مستمر)" if current_interval == 0 else f"{current_interval} ثانية"
+        status_desc = "[FAST] الوضع اللحظي (فحص فوري مستمر)" if current_interval == 0 else f"{current_interval} ثانية"
         msg = (
             f"⏱ *التحكم في الفاصل الزمني لمراقبة GitHub Actions:*\n\n"
             f"• الفاصل الحالي: *{status_desc}*\n\n"
@@ -1742,14 +1742,14 @@ def handle_interval(chat_id: int, arg: str = "") -> None:
     try:
         val = int(arg.strip())
         if val < 0:
-            send_telegram(chat_id, "⚠️ يجب إدخال قيمة موجبة أو 0 للوضع اللحظي.")
+            send_telegram(chat_id, "[WARN] يجب إدخال قيمة موجبة أو 0 للوضع اللحظي.")
             return
         cfg["actions_interval"] = val
         save_config(cfg)
         if val == 0:
             send_telegram(
                 chat_id,
-                "⚡ *تم تفعيل الوضع اللحظي لمراقبة GitHub Actions بنجاح.*\n"
+                "[FAST] *تم تفعيل الوضع اللحظي لمراقبة GitHub Actions بنجاح.*\n"
                 "سيقوم النظام بمراقبة العمليات بشكل فوري وتنبيهك بأي تحديث لحظة وقوعه مباشرة."
             )
         else:
@@ -1758,12 +1758,12 @@ def handle_interval(chat_id: int, arg: str = "") -> None:
                 f"⏱ *تم ضبط الفاصل الزمني للتحقق من GitHub Actions إلى:* `{val}` ثانية."
             )
     except ValueError:
-        send_telegram(chat_id, "⚠️ يرجى كتابة عدد الثواني بالأرقام، مثال:\n`/interval 0` أو `/interval 30`")
+        send_telegram(chat_id, "[WARN] يرجى كتابة عدد الثواني بالأرقام، مثال:\n`/interval 0` أو `/interval 30`")
 
 
 def handle_help(chat_id: int) -> None:
     msg = (
-        "🤖 *دليل أوامر التحكم والمزامنة والبناء ومراقبة Actions:*\n\n"
+        "[SYSTEM] *دليل أوامر التحكم والمزامنة وإدارة العمليات:*\n\n"
         "• `/server` - تشغيل السيرفرات المحلية للمشاريع بالكامل مع كشف البورتات والروابط.\n"
         "  _أمثلة:_ `/server <project>` أو `/server all`\n\n"
         "• `/servers` - عرض كافة السيرفرات النشطة حالياً على مستوى جهاز الماك/النظام.\n\n"
@@ -1772,7 +1772,7 @@ def handle_help(chat_id: int) -> None:
         "• `/stop` - إيقاف سيرفر محدد أو كافة السيرفرات وتحرير البورتات فوراً.\n"
         "  _أمثلة:_ `/stop <project>` أو `/stop all`\n\n"
         "• `/health` - فحص صحة وموارد جهاز الماك (RAM, CPU, Disks, Uptime).\n\n"
-        "• `/diagnose` - تشخيص الأخطاء فوراً واقتراح الحلول عبر الذكاء الاصطناعي.\n\n"
+        "• `/diagnose` - فحص سجلات الأخطاء وتقديم تقرير المعالجة الفني.\n\n"
         "• `/build` - بناء التطبيقات عبر GitHub Actions واستلام الملفات مباشرة.\n"
         "  _أمثلة:_ `/build <target>` أو اختيار الهدف من القائمة\n\n"
         "• `/interval` - التحكم بالفاصل الزمني لمراقبة GitHub Actions (0 للحظي).\n\n"
@@ -1781,7 +1781,7 @@ def handle_help(chat_id: int) -> None:
         "• `/commit` - حفظ التعديلات محلياً فقط دون رفع.\n"
         "• `/status` - فحص حالة الفروع والتعديلات المعلقة.\n"
         "• `/clear` - تصفير سياق الحوار وبدء جلسة جديدة.\n\n"
-        "💬 _يمكنك أيضاً كتابة أي استفسار باللغة الطبيعية عن مكان أي ملف أو تاريخ العمل._"
+        "_يمكنك أيضاً الاستعلام مباشرة عن تفاصيل أي ملف أو مسار أو عملية داخل النظام._"
     )
     send_telegram(chat_id, msg)
 
@@ -1791,7 +1791,7 @@ def handle_help(chat_id: int) -> None:
 
 def handle_clear(chat_id: int) -> None:
     memory.clear()
-    send_telegram(chat_id, "✅ تم تصفير الذاكرة وبدء جلسة جديدة.", reply_markup=KEYBOARD)
+    send_telegram(chat_id, "[OK] تم تصفير الذاكرة وبدء جلسة جديدة.", reply_markup=KEYBOARD)
 
 
 def gather_work_context(user_query: str, history: list[dict]) -> str:
@@ -1884,7 +1884,7 @@ def handle_smart_chat(chat_id: int, user_text: str) -> None:
     context = gather_work_context(user_text, history)
 
     system_prompt = (
-        "أنت مساعد تقني وإداري رسمي ومقتضب جداً لمحمد في شركة WAI-Soft.\n"
+        "أنت محرك تحليل واستعلامات تشغيلي لنظام WAISoft-Reports.\n"
         "قواعد صارمة جداً لأسلوب الرد:\n"
         "1. كن رسمياً، مهنياً، ومقتضباً إلى أقصى حد ممكن (بدون إخلال بالمعلومة المطلوبة).\n"
         "2. ادخل في صلب الإجابة مباشرة بنقاط محددة، أرقام دقيقة، ومسارات صريحة.\n"
@@ -1915,7 +1915,7 @@ def process_callback_query(query: dict) -> None:
     data = query.get("data", "")
 
     if from_id != AUTHORIZED_USER_ID:
-        answer_callback_query(query_id, "⛔ غير مصرح.")
+        answer_callback_query(query_id, "[ACCESS DENIED] غير مصرح.")
         return
 
     answer_callback_query(query_id)
@@ -1952,7 +1952,7 @@ def process_message(msg: dict) -> None:
     if from_id != AUTHORIZED_USER_ID:
         log(f"Unauthorized message from user {from_id}: {raw_text}")
         if chat_id:
-            send_telegram(chat_id, "⛔ غير مصرح.")
+            send_telegram(chat_id, "[ACCESS DENIED] غير مصرح.")
         return
 
     log(f"Processing message: {raw_text}")
@@ -2021,13 +2021,13 @@ def process_message(msg: dict) -> None:
         handle_stop_server(chat_id)
     elif text in {"build", "بناء", "apk"}:
         handle_build(chat_id)
-    elif text in {"تقرير", "تقرير المدير", "📊 تقرير المدير"}:
+    elif text in {"تقرير", "تقرير المدير", "تقرير الإنجاز"}:
         handle_manager_report(chat_id)
-    elif text in {"حالة", "المشاريع", "ℹ️ المشاريع"}:
+    elif text in {"حالة", "المشاريع", "المستودعات"}:
         handle_status(chat_id)
-    elif text in {"حفظ", "💾 حفظ (commit)"}:
+    elif text in {"حفظ", "حفظ (commit)"}:
         handle_commit(chat_id)
-    elif text in {"رفع", "مزامنة", "commit+push", "🚀 رفع (push)"}:
+    elif text in {"رفع", "مزامنة", "commit+push", "رفع (push)"}:
         handle_push(chat_id)
     else:
         handle_smart_chat(chat_id, raw_text)
@@ -2052,7 +2052,7 @@ def process_inline_query(iq: dict) -> None:
                 results.append({
                     "type": "article",
                     "id": f"build_{k}",
-                    "title": f"🔨 {title_text}",
+                    "title": f"[بناء] {title_text}",
                     "description": f"تشغيل workflow وبناء {v.get('repo', k)}",
                     "input_message_content": {"message_text": f"/build {k}"},
                 })
@@ -2063,7 +2063,7 @@ def process_inline_query(iq: dict) -> None:
         all_rep = {
             "type": "article",
             "id": "report_all",
-            "title": "📊 التقرير الشامل لجميع المشاريع",
+            "title": "[تقرير] التقرير الشامل لجميع المشاريع",
             "description": "تقرير إداري تنفيذي ليوم العمل منذ 3:00 ص",
             "input_message_content": {"message_text": "/report all"},
         }
@@ -2074,7 +2074,7 @@ def process_inline_query(iq: dict) -> None:
                 results.append({
                     "type": "article",
                     "id": f"report_{r.name}",
-                    "title": f"📁 تقرير مشروع {r.name}",
+                    "title": f"[مشروع] تقرير مشروع {r.name}",
                     "description": f"حصر الأعمال في {r.name} منذ 3:00 ص",
                     "input_message_content": {"message_text": f"/report {r.name}"},
                 })
@@ -2086,7 +2086,7 @@ def process_inline_query(iq: dict) -> None:
             results.append({
                 "type": "article",
                 "id": "server_all",
-                "title": "🚀 تشغيل كافة المشاريع (All Projects)",
+                "title": "[تشغيل] تشغيل كافة المشاريع (All Projects)",
                 "description": "تشغيل كافة السيرفرات المحلية لكافة المشاريع دفعة واحدة",
                 "input_message_content": {"message_text": "/server all"},
             })
@@ -2100,7 +2100,7 @@ def process_inline_query(iq: dict) -> None:
                     results.append({
                         "type": "article",
                         "id": f"server_{proj}",
-                        "title": f"🚀 تشغيل {title}",
+                        "title": f"[تشغيل] تشغيل {title}",
                         "description": f"تشغيل خوادم مشروع {proj}",
                         "input_message_content": {"message_text": f"/server {proj}"},
                     })
@@ -2112,7 +2112,7 @@ def process_inline_query(iq: dict) -> None:
             results.append({
                 "type": "article",
                 "id": "stop_all",
-                "title": "🛑 إيقاف كافة السيرفرات (Stop All)",
+                "title": "[إيقاف الكل] إيقاف كافة السيرفرات (Stop All)",
                 "description": "إيقاف جميع السيرفرات النشطة دفعة واحدة وتحرير بورتاتها",
                 "input_message_content": {"message_text": "/stop all"},
             })
@@ -2126,7 +2126,7 @@ def process_inline_query(iq: dict) -> None:
                     results.append({
                         "type": "article",
                         "id": f"stop_{proj}",
-                        "title": f"🛑 إيقاف سيرفرات {title}",
+                        "title": f"[إيقاف] إيقاف سيرفرات {title}",
                         "description": f"إيقاف خوادم مشروع {proj}",
                         "input_message_content": {"message_text": f"/stop {proj}"},
                     })
@@ -2138,7 +2138,7 @@ def process_inline_query(iq: dict) -> None:
             results.append({
                 "type": "article",
                 "id": "restart_all",
-                "title": "🔄 إعادة تشغيل كافة المشاريع (Restart All)",
+                "title": "[إعادة تشغيل] إعادة تشغيل كافة المشاريع (Restart All)",
                 "description": "إيقاف وتحرير البورتات ثم إعادة تشغيل جميع السيرفرات النشطة",
                 "input_message_content": {"message_text": "/restart all"},
             })
@@ -2152,7 +2152,7 @@ def process_inline_query(iq: dict) -> None:
                     results.append({
                         "type": "article",
                         "id": f"restart_{proj}",
-                        "title": f"🔄 إعادة تشغيل سيرفرات {title}",
+                        "title": f"[إعادة تشغيل] إعادة تشغيل سيرفرات {title}",
                         "description": f"إعادة تشغيل خوادم مشروع {proj}",
                         "input_message_content": {"message_text": f"/restart {proj}"},
                     })
@@ -2162,7 +2162,7 @@ def process_inline_query(iq: dict) -> None:
         results.append({
             "type": "article",
             "id": "health_mac",
-            "title": "🖥️ صحة وموارد جهاز الماك (Health & Specs)",
+            "title": "[صحة النظام] صحة وموارد النظام (System Health)",
             "description": "فحص RAM، المعالج CPU، الأقراص، Uptime، والسيرفرات النشطة",
             "input_message_content": {"message_text": "/health"},
         })
@@ -2172,7 +2172,7 @@ def process_inline_query(iq: dict) -> None:
         results.append({
             "type": "article",
             "id": "diagnose_error",
-            "title": "🤖 تشخيص الخطأ الأخير بالذكاء الاصطناعي (AI Diagnostics)",
+            "title": "[DIAG] تشخيص الخطأ الأخير في النظام",
             "description": "تحليل أسباب انهيار السيرفر أو فشل البناء واقتراح حل جذري",
             "input_message_content": {"message_text": "/diagnose"},
         })

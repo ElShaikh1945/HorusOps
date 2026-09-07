@@ -174,7 +174,7 @@ def _resolve_repo_token(token: str, found: list[str], scan_parent: Path) -> list
                     if 0 <= idx < len(found):
                         results.append(found[idx])
                     else:
-                        print(f"  ⚠ index {idx} out of range — skipped")
+                        print(f"  [WARN] index {idx} out of range — skipped")
                 return results
 
     if lo.isdigit():
@@ -182,7 +182,7 @@ def _resolve_repo_token(token: str, found: list[str], scan_parent: Path) -> list
         if 0 <= idx < len(found):
             results.append(found[idx])
         else:
-            print(f"  ⚠ index {idx} out of range — skipped")
+            print(f"  [WARN] index {idx} out of range — skipped")
         return results
 
     candidate = Path(token).expanduser()
@@ -202,7 +202,7 @@ def _resolve_repo_token(token: str, found: list[str], scan_parent: Path) -> list
         if candidate.exists() and candidate.is_dir():
             results.append(str(candidate.resolve()))
         else:
-            print(f"  ⚠ path not a directory: {token!r}")
+            print(f"  [WARN] path not a directory: {token!r}")
         return results
 
     # fallback to substring match in discovered paths
@@ -210,7 +210,7 @@ def _resolve_repo_token(token: str, found: list[str], scan_parent: Path) -> list
     if matches:
         results.extend(matches)
     else:
-        print(f"  ⚠ no repo matching {token!r} — skipped")
+        print(f"  [WARN] no repo matching {token!r} — skipped")
     return results
 
 
@@ -261,7 +261,7 @@ def run_init(args) -> int:
                 for i, p in enumerate(found):
                     print(f"    [{i}] {p}")
             else:
-                print("  ⚠ Too many repos found; listing is skipped")
+                print("  [WARN] Too many repos found; listing is skipped")
                 print("  You can still enter index/range or absolute path values below.")
 
             if yes:
@@ -309,13 +309,13 @@ def run_init(args) -> int:
         else:
             print(f"  AI provider options: {', '.join(providers)}")
             if has_claude:
-                print("  ✓ claude detected on PATH")
+                print("  [OK] claude detected on PATH")
             else:
-                print("  ⚠ claude not found on PATH")
+                print("  [WARN] claude not found on PATH")
             ans = input(f"  Choose AI provider [{default_provider}]: ").strip()
             ai_provider = ans if ans in providers else default_provider
 
-        print(f"  ✓ ai_provider = {ai_provider}")
+        print(f"  [OK] ai_provider = {ai_provider}")
 
         # ------------------------------------------------------------------ 4. notify_on
         default_notify = "change_or_fail"
@@ -325,7 +325,7 @@ def run_init(args) -> int:
             opts = "change_or_fail / fail_only / always"
             ans = input(f"  notify_on ({opts}) [{default_notify}]: ").strip()
             notify_on = ans if ans in {"change_or_fail", "fail_only", "always"} else default_notify
-        print(f"  ✓ notify_on = {notify_on}")
+        print(f"  [OK] notify_on = {notify_on}")
 
         # ------------------------------------------------------------------ 5. Log path
         default_log = str(Path.home() / ".git-auto-sync" / "sync.log")
@@ -334,7 +334,7 @@ def run_init(args) -> int:
         else:
             ans = input(f"  Log file path [{default_log}]: ").strip()
             log_path = ans if ans else default_log
-        print(f"  ✓ log_path = {log_path}")
+        print(f"  [OK] log_path = {log_path}")
 
         # ------------------------------------------------------------------ 6. Telegram / Lark
         telegram: dict | None = None
@@ -370,16 +370,16 @@ def run_init(args) -> int:
             lark=lark,
         )
         config_path.write_text(toml_str, encoding="utf-8")
-        print(f"\n✓ Wrote {config_path}")
+        print(f"\n[OK] Wrote {config_path}")
 
         try:
             load_config(config_path)
             if placeholder_used:
-                print("✓ Config valid (placeholder repo written — edit before running sync)")
+                print("[OK] Config valid (placeholder repo written — edit before running sync)")
             else:
-                print("✓ Config valid")
+                print("[OK] Config valid")
         except Exception as exc:
-            print(f"✗ Config validation failed: {exc}", file=sys.stderr)
+            print(f"[FAIL] Config validation failed: {exc}", file=sys.stderr)
             return 1
 
         # ------------------------------------------------------------------ 8. Scheduler
@@ -394,9 +394,9 @@ def run_init(args) -> int:
                     from git_auto_sync.scheduler import install
 
                     result = install(interval)
-                    print(f"  ✓ {result}")
+                    print(f"  [OK] {result}")
                 except Exception as exc:
-                    print(f"  ✗ Scheduler install failed: {exc}", file=sys.stderr)
+                    print(f"  [FAIL] Scheduler install failed: {exc}", file=sys.stderr)
             else:
                 print("  To install the scheduler later, run:")
                 print("    git-auto-sync install --interval 30m")
@@ -406,8 +406,8 @@ def run_init(args) -> int:
         print(f"  • Edit {config_path} to add/adjust [[repos]]")
         print("  • Dry-run: git-auto-sync sync --dry-run")
         print("  • Check config: git-auto-sync config check")
-        print("\n✓ Done.")
+        print("\n[OK] Done.")
         return 0
     except (KeyboardInterrupt, EOFError):
-        print("\n⚠ Setup canceled by user.", file=sys.stderr)
+        print("\n[WARN] Setup canceled by user.", file=sys.stderr)
         return 130

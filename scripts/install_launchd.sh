@@ -27,7 +27,7 @@ sed "s|__APP_DIR__|$DIR|g" "services/$PLIST_NAME" > "$TARGET_PLIST"
 # Load new service
 launchctl load -w "$TARGET_PLIST"
 
-echo "[✓] Successfully installed and started com.waisoft.bot"
+echo "[OK] Successfully installed and started com.waisoft.bot"
 echo "[*] Plist location: $TARGET_PLIST"
 echo "[*] Logs: $DIR/server_logs/bot_stdout.log"
 echo ""

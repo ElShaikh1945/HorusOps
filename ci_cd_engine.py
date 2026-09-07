@@ -121,16 +121,16 @@ def fetch_run_job_steps(owner: str, repo: str, run_id: int) -> tuple[str, list[s
                     conclusion = s.get("conclusion")
                     if status == "completed":
                         if conclusion == "success":
-                            lines.append(f"✅ {title}")
+                            lines.append(f"[OK] {title}")
                         elif conclusion == "skipped":
-                            lines.append(f"⏭️ {title} (تم التخطي)")
+                            lines.append(f"[SKIP] {title} (تم التخطي)")
                         else:
-                            lines.append(f"❌ {title} (فشل)")
+                            lines.append(f"[FAIL] {title} (فشل)")
                     elif status == "in_progress":
                         active_step = title
-                        lines.append(f"⏳ {title} (جارٍ التنفيذ الآن...)")
+                        lines.append(f"[RUN] {title} (جارٍ التنفيذ الآن...)")
                     else:
-                        lines.append(f"▫️ {title}")
+                        lines.append(f"[-] {title}")
                 if not active_step and lines:
                     if all(s.get("status") == "completed" for s in steps if not s.get("name", "").startswith("Post ") and s.get("name") != "Complete job"):
                         active_step = "اكتملت جميع الخطوات بنجاح"

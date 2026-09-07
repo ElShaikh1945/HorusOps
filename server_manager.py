@@ -466,7 +466,7 @@ def stop_service(service_key: str) -> tuple[bool, str]:
         except Exception:
             pass
 
-    return True, f"تم إيقاف {info['title']} وتحرير البورت {port} بنجاح.\n⏱ *توقيت الإيقاف:* `{now_str}`"
+    return True, f"تم إيقاف {info['title']} وتحرير البورت {port} بنجاح.\n[TIME] *توقيت الإيقاف:* `{now_str}`"
 
 
 def stop_all_services() -> list[str]:

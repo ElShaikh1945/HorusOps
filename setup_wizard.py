@@ -280,21 +280,21 @@ HTML_PAGE = """<!DOCTYPE html>
     <header class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-6">
       <div>
         <div class="flex items-center gap-3">
-          <span class="text-3xl">🤖</span>
+          <span class="px-2.5 py-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-mono text-xs font-bold">[SYS]</span>
           <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
-            WAISoft-Reports | معالج الإعداد
+            WAISoft-Reports | لوحة إعدادات النظام
           </h1>
         </div>
         <p class="text-sm text-slate-400 mt-1">
-          واجهة تهيئة مفتوحة المصدر لإدارة المشاريع، المزامنة، السيرفرات، وبوت تيليجرام.
+          واجهة تهيئة مفتوحة المصدر لإدارة المستودعات، المزامنة، الخوادم، وبوت تيليجرام.
         </p>
       </div>
       <div class="flex items-center gap-2">
         <button id="saveTopBtn" onclick="saveAllConfig()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 font-semibold rounded-lg shadow-lg shadow-blue-600/20 transition flex items-center gap-2 text-sm">
-          💾 حفظ الإعدادات
+          [حفظ الإعدادات]
         </button>
         <button id="startBotTopBtn" onclick="startBotDaemon()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 font-semibold rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center gap-2 text-sm">
-          🚀 تشغيل البوت
+          [تشغيل البوت]
         </button>
       </div>
     </header>
@@ -302,22 +302,22 @@ HTML_PAGE = """<!DOCTYPE html>
     <!-- Notification Toast -->
     <div id="toast" class="hidden mb-6 p-4 rounded-xl text-sm font-medium transition duration-300 flex items-center justify-between shadow-lg">
       <span id="toastMsg"></span>
-      <button onclick="hideToast()" class="text-slate-400 hover:text-white mr-4">✕</button>
+      <button onclick="hideToast()" class="text-slate-400 hover:text-white mr-4">x</button>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="flex border-b border-slate-800 mb-6 gap-2 overflow-x-auto text-sm font-semibold">
       <button onclick="switchTab(1)" id="tabBtn1" class="px-4 py-3 rounded-t-lg border-b-2 border-transparent hover:text-blue-400 transition tab-active flex items-center gap-2">
-        🔑 التوكنات والذكاء الاصطناعي
+        [1] مفاتيح الربط والخدمات
       </button>
       <button onclick="switchTab(2)" id="tabBtn2" class="px-4 py-3 rounded-t-lg border-b-2 border-transparent hover:text-blue-400 transition text-slate-400 flex items-center gap-2">
-        📁 المستودعات والمزامنة
+        [2] المستودعات والمزامنة
       </button>
       <button onclick="switchTab(3)" id="tabBtn3" class="px-4 py-3 rounded-t-lg border-b-2 border-transparent hover:text-blue-400 transition text-slate-400 flex items-center gap-2">
-        🖥️ السيرفرات المحلية
+        [3] الخوادم والعمليات
       </button>
       <button onclick="switchTab(4)" id="tabBtn4" class="px-4 py-3 rounded-t-lg border-b-2 border-transparent hover:text-blue-400 transition text-slate-400 flex items-center gap-2">
-        📱 أهداف البناء والـ CI/CD
+        [4] خطوط البناء والـ CI/CD
       </button>
     </div>
 
@@ -325,7 +325,7 @@ HTML_PAGE = """<!DOCTYPE html>
     <div id="tab1" class="space-y-6">
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
         <h2 class="text-lg font-bold text-blue-400 flex items-center gap-2">
-          🤖 إعدادات بوت تيليجرام
+          إعدادات بوت تيليجرام
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -333,7 +333,7 @@ HTML_PAGE = """<!DOCTYPE html>
             <div class="flex gap-2">
               <input id="tgToken" type="password" placeholder="123456789:ABCdefGHI..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500">
               <button onclick="testTelegram()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-lg transition whitespace-nowrap">
-                ⚡ فحص الاتصال
+                فحص الاتصال
               </button>
             </div>
             <p id="tgStatus" class="text-xs mt-1.5 text-slate-400"></p>
@@ -347,7 +347,7 @@ HTML_PAGE = """<!DOCTYPE html>
 
         <div class="border-t border-slate-700/50 pt-6">
           <h2 class="text-lg font-bold text-purple-400 flex items-center gap-2 mb-4">
-            🧠 مزود الذكاء الاصطناعي (Groq Cloud)
+            محرك التحليل والتشخيص (Groq API)
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -355,16 +355,16 @@ HTML_PAGE = """<!DOCTYPE html>
               <div class="flex gap-2">
                 <input id="groqKey" type="password" placeholder="gsk_..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-purple-500">
                 <button onclick="testGroq()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-lg transition whitespace-nowrap">
-                  ⚡ فحص المفتاح
+                  فحص المفتاح
                 </button>
               </div>
               <p id="groqStatus" class="text-xs mt-1.5 text-slate-400"></p>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-2">نموذج الذكاء الاصطناعي (Groq Model)</label>
+              <label class="block text-xs font-semibold text-slate-300 mb-2">نموذج التحليل (Groq Model)</label>
               <select id="groqModel" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-purple-500 text-slate-200">
                 <option value="qwen/qwen3.8-27b">Qwen 3.8 27B (الأفضل للتقارير والتشخيص الدقيق)</option>
-                <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile (عالي الذكاء والسرعة)</option>
+                <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile (عالي الدقة والسرعة)</option>
                 <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant (فائق السرعة)</option>
               </select>
             </div>
@@ -373,14 +373,14 @@ HTML_PAGE = """<!DOCTYPE html>
 
         <div class="border-t border-slate-700/50 pt-6">
           <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2 mb-4">
-            🐙 توكن GitHub الشخصي (Personal Access Token)
+            توكن GitHub الشخصي (Personal Access Token)
           </h2>
           <div class="max-w-lg">
             <label class="block text-xs font-semibold text-slate-300 mb-2">GitHub Token (لحزم الأندرويد و Actions)</label>
             <div class="flex gap-2">
               <input id="ghToken" type="password" placeholder="ghp_... أو gho_..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500">
               <button onclick="testGithub()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-lg transition whitespace-nowrap">
-                ⚡ فحص التوكن
+                فحص التوكن
               </button>
             </div>
             <p id="ghStatus" class="text-xs mt-1.5 text-slate-400"></p>
@@ -393,7 +393,7 @@ HTML_PAGE = """<!DOCTYPE html>
     <div id="tab2" class="hidden space-y-6">
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
         <h2 class="text-lg font-bold text-blue-400 flex items-center gap-2">
-          📁 مسار المشاريع وقواعد المزامنة
+          مسار المشاريع وقواعد المزامنة
         </h2>
         <div class="space-y-4">
           <div>
@@ -416,14 +416,14 @@ HTML_PAGE = """<!DOCTYPE html>
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
-              🖥️ إدارة السيرفرات المحلية للمشاريع
+              إدارة الخوادم المحلية للمشاريع
             </h2>
             <p class="text-xs text-slate-400 mt-1">
               عرّف خدمات مشاريعك ليتمكن البوت من تشغيلها، إيقافها، حل تعارض بورتاتها، وتشخيص أخطائها.
             </p>
           </div>
           <button onclick="addServerCard()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded-lg transition flex items-center gap-1.5">
-            ➕ إضافة خدمة / سيرفر
+            [+] إضافة خدمة
           </button>
         </div>
 
@@ -439,14 +439,14 @@ HTML_PAGE = """<!DOCTYPE html>
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
-              📱 أهداف البناء ومراقبة GitHub Actions
+              أهداف البناء ومراقبة GitHub Actions
             </h2>
             <p class="text-xs text-slate-400 mt-1">
               اربط الـ Workflows ليقوم البوت ببنائها وتحميل ملفات الـ APK مباشرة إليك في تيليجرام.
             </p>
           </div>
           <button onclick="addTargetCard()" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-xs font-bold rounded-lg transition flex items-center gap-1.5">
-            ➕ إضافة هدف بناء
+            [+] إضافة هدف بناء
           </button>
         </div>
 
@@ -537,7 +537,7 @@ HTML_PAGE = """<!DOCTYPE html>
       card.innerHTML = `
         <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
           <input type="text" value="${key}" placeholder="service_key (e.g. web_app)" class="srv-key font-bold text-sm bg-transparent text-emerald-400 border-none focus:outline-none">
-          <button onclick="this.closest('.server-entry').remove()" class="text-slate-500 hover:text-rose-400 text-xs font-semibold">✕ حذف</button>
+          <button onclick="this.closest('.server-entry').remove()" class="text-slate-500 hover:text-rose-400 text-xs font-semibold">x حذف</button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div>
@@ -600,7 +600,7 @@ HTML_PAGE = """<!DOCTYPE html>
       card.innerHTML = `
         <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
           <input type="text" value="${key}" placeholder="target_key" class="tgt-key font-bold text-sm bg-transparent text-amber-400 border-none focus:outline-none">
-          <button onclick="this.closest('.target-entry').remove()" class="text-slate-500 hover:text-rose-400 text-xs font-semibold">✕ حذف</button>
+          <button onclick="this.closest('.target-entry').remove()" class="text-slate-500 hover:text-rose-400 text-xs font-semibold">x حذف</button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div>
@@ -662,10 +662,10 @@ HTML_PAGE = """<!DOCTYPE html>
       });
       const data = await res.json();
       if (data.ok) {
-        status.innerText = `✅ متصل بنجاح: ${data.name} (@${data.username})`;
+        status.innerText = `[OK] متصل بنجاح: ${data.name} (@${data.username})`;
         status.className = "text-xs mt-1.5 text-emerald-400 font-semibold";
       } else {
-        status.innerText = `❌ فشل الاتصال: ${data.error}`;
+        status.innerText = `[ERROR] فشل الاتصال: ${data.error}`;
         status.className = "text-xs mt-1.5 text-rose-400 font-semibold";
       }
     }
@@ -682,10 +682,10 @@ HTML_PAGE = """<!DOCTYPE html>
       });
       const data = await res.json();
       if (data.ok) {
-        status.innerText = `✅ المفتاح صالح (${data.models_count} نموذج متوفر)`;
+        status.innerText = `[OK] المفتاح صالح (${data.models_count} نموذج متوفر)`;
         status.className = "text-xs mt-1.5 text-emerald-400 font-semibold";
       } else {
-        status.innerText = `❌ خطأ في المفتاح: ${data.error}`;
+        status.innerText = `[ERROR] خطأ في المفتاح: ${data.error}`;
         status.className = "text-xs mt-1.5 text-rose-400 font-semibold";
       }
     }
@@ -702,10 +702,10 @@ HTML_PAGE = """<!DOCTYPE html>
       });
       const data = await res.json();
       if (data.ok) {
-        status.innerText = `✅ التوكن صالح للمستخدم: @${data.login}`;
+        status.innerText = `[OK] التوكن صالح للمستخدم: @${data.login}`;
         status.className = "text-xs mt-1.5 text-emerald-400 font-semibold";
       } else {
-        status.innerText = `❌ خطأ في التوكن: ${data.error}`;
+        status.innerText = `[ERROR] خطأ في التوكن: ${data.error}`;
         status.className = "text-xs mt-1.5 text-rose-400 font-semibold";
       }
     }
@@ -795,15 +795,16 @@ def main():
     args = parser.parse_args()
 
     port = get_free_port(args.port)
+    socketserver.TCPServer.allow_reuse_address = True
     server_address = ("127.0.0.1", port)
     httpd = socketserver.TCPServer(server_address, SetupRequestHandler)
     url = f"http://localhost:{port}"
 
     print("=" * 65)
-    print(" 🚀 WAISoft-Reports | Web Configuration Wizard")
+    print(" [SYSTEM] WAISoft-Reports | Web Configuration Console")
     print("=" * 65)
-    print(f"\n🔗 Opening Web Setup Wizard at: {url}\n")
-    print("Press Ctrl+C in this terminal to stop the wizard.")
+    print(f"\n[INFO] Configuration Console running at: {url}\n")
+    print("Press Ctrl+C in this terminal to stop.")
     print("=" * 65)
 
     try:

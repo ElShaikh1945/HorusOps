@@ -218,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.func(args)
     except (KeyboardInterrupt, EOFError):
-        print("\n⚠ Interrupted by user.", file=sys.stderr)
+        print("\n[WARN] Interrupted by user.", file=sys.stderr)
         return 130
 
 

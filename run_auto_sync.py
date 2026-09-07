@@ -66,17 +66,17 @@ def main() -> int:
     if not ok:
         log(f"Environment check failed: {err_msg}")
         if is_midnight:
-            notify_telegram(f"⚠️ *تنبيه الفحص الليلي (12:00 منتصف الليل):*\nتعذر فحص المشاريع: {err_msg}")
+            notify_telegram(f"[WARN] *تقرير الفحص الليلي (12:00 منتصف الليل):*\nتعذر فحص المشاريع: {err_msg}")
         return 1
 
     result = execute_full_push()
     if not result.get("ok"):
         log(f"Push failed: {result.get('error')}")
-        notify_telegram(f"❌ *تنبيه خطأ في المزامنة:*\n{result.get('error')}")
+        notify_telegram(f"[ERROR] *تنبيه خطأ في المزامنة:*\n{result.get('error')}")
         return 1
 
     if result.get("has_conflicts"):
-        conflict_lines = ["🚨 *تنبيه المزامنة المجدولة: تعارض في الدمج (Merge Conflict)*"]
+        conflict_lines = ["[ALERT] *تنبيه المزامنة المجدولة: تعارض في الدمج (Merge Conflict)*"]
         for r in result["results"]:
             if r.get("status") == "conflict":
                 conflict_lines.append(f"• المشروع: `{r['repo']}`")
@@ -86,7 +86,7 @@ def main() -> int:
         return 2
 
     if result.get("has_errors"):
-        error_lines = ["⚠️ *تنبيه: أخطاء أثناء مزامنة بعض المشاريع:*"]
+        error_lines = ["[WARN] *تنبيه: أخطاء أثناء مزامنة بعض المشاريع:*"]
         for r in result["results"]:
             if r.get("status") == "error":
                 error_lines.append(f"• المشروع: `{r['repo']}`\n  السبب: {r.get('error')}")
@@ -97,17 +97,17 @@ def main() -> int:
         log("All repositories are clean and up to date. No push needed.")
         if is_midnight:
             heartbeat_msg = (
-                "✅ *تقرير الفحص الليلي (12:00 منتصف الليل)*\n\n"
+                "[OK] *تقرير الفحص الليلي (12:00 منتصف الليل)*\n\n"
                 f"• تم فحص كافة مستودعات المشاريع في `{BASE_DIR}`.\n"
                 "• لا توجد أي تعديلات جديدة معلقة، وجميع المستودعات متزامنة مع GitHub.\n"
-                "• حالة الخادم والاتصال: متصل وجاهز للعمل 🟢"
+                "• حالة الخادم والاتصال: [UP] متصل وجاهز للعمل"
             )
             notify_telegram(heartbeat_msg)
         return 0
 
-    lines = ["✅ *تقرير المزامنة التلقائية المجدولة*\n"]
+    lines = ["[OK] *تقرير المزامنة التلقائية المجدولة*\n"]
     for p in pushed_items:
-        lines.append(f"📦 *مشروع:* `{p['repo']}`")
+        lines.append(f"[PROJECT] *مشروع:* `{p['repo']}`")
         if p.get("commit_url"):
             lines.append(f"• الـ Commit الجديد: [{p['new_commit_hash']}]({p['commit_url']}) - {p['new_commit_msg']}")
         else:

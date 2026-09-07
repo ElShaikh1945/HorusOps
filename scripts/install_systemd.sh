@@ -23,7 +23,7 @@ systemctl --user daemon-reload
 systemctl --user enable "$SERVICE_NAME"
 systemctl --user restart "$SERVICE_NAME"
 
-echo "[✓] Successfully installed and started $SERVICE_NAME"
+echo "[OK] Successfully installed and started $SERVICE_NAME"
 echo "[*] Service location: $TARGET_FILE"
 echo "[*] Logs: $DIR/server_logs/bot_stdout.log"
 echo ""
