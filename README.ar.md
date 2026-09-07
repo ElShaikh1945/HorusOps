@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/%D8%A7%D9%84%D8%AA%D8%B1%D8%AE%D9%8A%D8%B5-%D8%A7%D8%AD%D8%AA%D9%83%D8%A7%D8%B1%D9%8A%20%7C%20%D9%84%D9%84%D8%A5%D8%B7%D9%84%D8%A7%D8%B9%20%D9%81%D9%82%D8%B7-red.svg?style=flat-square" alt="الترخيص: للإطلاع فقط"></a>
   <a href="README.ar.md"><img src="https://img.shields.io/badge/Language-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-2ea44f.svg?style=flat-square" alt="الوثائق بالعربية"></a>
   <img src="https://img.shields.io/badge/%D8%A7%D9%84%D8%AA%D9%87%D9%8A%D8%A6%D8%A9-100%25%20CLI%20%26%20Terminal-00d2ff.svg?style=flat-square" alt="100% CLI">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+">
@@ -259,6 +259,14 @@ pip install -r requirements.txt
 
 ---
 
-## الترخيص
+## شكر وتقدير
 
-هذا المشروع مرخص بموجب **رخصة MIT** مفتوحة المصدر - راجع ملف [LICENSE](LICENSE) لمزيد من التفاصيل.
+يحتوي المجلد الفرعي لمزامنة Git التلقائية (`git_auto_sync/`) على كود تأسيسي مقتبس من مشروع [git-auto-sync](https://github.com/OctopusGarage/git-auto-sync) التابع لـ OctopusGarage، والمرخص بموجب رخصة MIT. كافة مكونات المنصة الأخرى، ومشرف الخوادم، ومحرك CI/CD، وخادم بوت تيليجرام، ومعالج الإعداد هي برمجيات احتكارية خاصة بمنصة HorusOps.
+
+---
+
+## الترخيص (حقوق الملكية الفكرية)
+
+حقوق النشر (c) 2026 محمد الشيخ. جميع الحقوق محفوظة.
+
+هذا المشروع **احتكاري ومتاح المصدر للإطلاع الشخصي والتقييم الأكاديمي فقط (Proprietary - Source Available for Viewing Only)**. يُحظر تماماً نسخ الكود، أو تعديله، أو إعادة نشره وتوزيعه، أو استخدامه تجارياً أو تشغيله في بيئات الإنتاج دون الحصول على إذن كتابي وصريح ومسبق من صاحب حقوق النشر. راجع ملف [LICENSE](LICENSE) لكافة التفاصيل والشروط القانونية.

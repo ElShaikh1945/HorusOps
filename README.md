@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Proprietary%20%7C%20View%20Only-red.svg?style=flat-square" alt="License: Proprietary (View Only)"></a>
   <a href="README.ar.md"><img src="https://img.shields.io/badge/Language-Arabic%20Docs-2ea44f.svg?style=flat-square" alt="Arabic Documentation"></a>
   <img src="https://img.shields.io/badge/Interface-100%25%20CLI%20%26%20Terminal-00d2ff.svg?style=flat-square" alt="100% CLI">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+">
@@ -322,6 +322,14 @@ SYNC_INTERVAL_MINUTES="30"
 
 ---
 
+## Acknowledgments
+
+The Git auto-synchronization sub-package (`git_auto_sync/`) contains foundational logic derived from [git-auto-sync](https://github.com/OctopusGarage/git-auto-sync) by OctopusGarage, licensed under the MIT License. All other platform components, server supervisors, CI/CD engines, Telegram daemons, and configuration wizards are proprietary to HorusOps.
+
+---
+
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+Copyright (c) 2026 Muhammad Al-Shaikh. All Rights Reserved.
+
+This software is **proprietary and source-available for personal review and educational evaluation only**. No copying, reproduction, distribution, modification, sublicensing, or commercial execution is permitted without prior written and explicit consent from the author. See the [LICENSE](LICENSE) file for complete legal terms.

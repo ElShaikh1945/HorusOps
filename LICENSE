@@ -1,21 +1,41 @@
-MIT License
+Copyright (c) 2026 Muhammad Al-Shaikh. All Rights Reserved.
 
-Copyright (c) 2026 WAISoft
+PROPRIETARY AND CONFIDENTIAL - SOURCE AVAILABLE FOR VIEWING ONLY
 
+This software and its associated documentation files (the "Software") are the 
+intellectual property of Muhammad Al-Shaikh.
+
+Permission is hereby granted to any person viewing this repository to inspect, 
+study, and evaluate the Software source code for personal, educational, and 
+non-commercial review only.
+
+STRICT RESTRICTIONS:
+1. You may NOT copy, reproduce, modify, merge, publish, distribute, sublicense, 
+   or create derivative works from this Software, in whole or in part, without 
+   prior written and explicit permission from the copyright holder.
+2. You may NOT deploy, execute, host, or run this Software for any commercial, 
+   production, business, or revenue-generating purposes without an explicit 
+   commercial license granted by the copyright holder.
+3. Automated scraping, extraction, mirroring, or re-branding of this repository 
+   is strictly prohibited.
+
+THIRD-PARTY COMPONENT NOTICE:
+The sub-package "git_auto_sync" contains foundational logic derived from 
+git-auto-sync by OctopusGarage, used under the terms of the MIT License:
+Copyright (c) OctopusGarage
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+furnished to do so, subject to the condition that the above copyright notice 
+and this permission notice shall be included in all copies or substantial 
+portions of the Software.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
+DISCLAIMER OF WARRANTY AND LIABILITY:
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF,
+OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

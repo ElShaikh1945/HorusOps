@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "Autonomous Self-Healing DevOps Platform, Git Auto-Sync & AI Server Orchestrator via Telegram"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "Proprietary - Source Available for Viewing Only" }
 authors = [{ name = "Muhammad Al-Shaikh", email = "muhammad.al-shaikh@outlook.com" }]
 keywords = ["devops", "self-healing", "git", "automation", "telegram-bot", "ci-cd", "server-manager", "infrastructure"]
 dependencies = [
