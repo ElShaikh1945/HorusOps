@@ -1,5 +1,5 @@
 [Unit]
-Description=WAISoft Reports Telegram Bot Daemon
+Description=HorusOps Telegram Bot Daemon
 After=network.target
 
 [Service]

@@ -4,7 +4,7 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
 
-SERVICE_NAME="waisoft-bot.service"
+SERVICE_NAME="horusops-bot.service"
 TARGET_DIR="$HOME/.config/systemd/user"
 TARGET_FILE="$TARGET_DIR/$SERVICE_NAME"
 
@@ -12,7 +12,7 @@ mkdir -p "$DIR/server_logs"
 mkdir -p "$TARGET_DIR"
 
 echo "=================================================="
-echo "   Installing WAISoft Bot as Linux systemd Service"
+echo "   Installing HorusOps Bot as Linux systemd Service"
 echo "=================================================="
 
 # Generate unit file with current path

@@ -202,9 +202,9 @@ Install the user-level systemd service:
 ```bash
 ./scripts/install_systemd.sh
 ```
-- Service Status: `systemctl --user status waisoft-bot.service`
-- Restart Daemon: `systemctl --user restart waisoft-bot.service`
-- Live Logs: `journalctl --user -u waisoft-bot.service -f`
+- Service Status: `systemctl --user status horusops-bot.service`
+- Restart Daemon: `systemctl --user restart horusops-bot.service`
+- Live Logs: `journalctl --user -u horusops-bot.service -f`
 
 #### On macOS (`launchd`)
 Install the persistent launch agent:
@@ -212,8 +212,8 @@ Install the persistent launch agent:
 ./scripts/install_launchd.sh
 ```
 - Live Logs: `tail -f server_logs/bot_stdout.log`
-- Stop Daemon: `launchctl stop com.waisoft.bot`
-- Unload Daemon: `launchctl unload ~/Library/LaunchAgents/com.waisoft.bot.plist`
+- Stop Daemon: `launchctl stop com.horusops.bot`
+- Unload Daemon: `launchctl unload ~/Library/LaunchAgents/com.horusops.bot.plist`
 
 ---
 

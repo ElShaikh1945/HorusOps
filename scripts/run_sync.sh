@@ -11,7 +11,7 @@ elif [ -d "venv" ]; then
 fi
 
 echo "=================================================="
-echo "      Running WAISoft Git Auto Sync"
+echo "      Running HorusOps Git Auto Sync"
 echo "=================================================="
 
 exec python3 run_auto_sync.py "$@"

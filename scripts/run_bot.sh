@@ -18,7 +18,7 @@ if ! python3 -c "import requests" &>/dev/null; then
 fi
 
 echo "=================================================="
-echo "    Starting WAISoft Telegram Bot Daemon"
+echo "    Starting HorusOps Telegram Bot Daemon"
 echo "=================================================="
 
 exec python3 telegram_bot_daemon.py

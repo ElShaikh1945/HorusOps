@@ -203,17 +203,17 @@ pip install -r requirements.txt
 ```bash
 ./scripts/install_systemd.sh
 ```
-- حالة الخدمة: `systemctl --user status waisoft-bot.service`
-- إعادة التشغيل: `systemctl --user restart waisoft-bot.service`
-- السجلات المباشرة: `journalctl --user -u waisoft-bot.service -f`
+- حالة الخدمة: `systemctl --user status horusops-bot.service`
+- إعادة التشغيل: `systemctl --user restart horusops-bot.service`
+- السجلات المباشرة: `journalctl --user -u horusops-bot.service -f`
 
 #### على نظام ماك (macOS launchd)
 ```bash
 ./scripts/install_launchd.sh
 ```
 - متابعة السجلات المباشرة: `tail -f server_logs/bot_stdout.log`
-- إيقاف الخدمة: `launchctl stop com.waisoft.bot`
-- إلغاء التثبيت: `launchctl unload ~/Library/LaunchAgents/com.waisoft.bot.plist`
+- إيقاف الخدمة: `launchctl stop com.horusops.bot`
+- إلغاء التثبيت: `launchctl unload ~/Library/LaunchAgents/com.horusops.bot.plist`
 
 ---
 
