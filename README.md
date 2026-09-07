@@ -58,6 +58,11 @@ Whether you manage multiple development repositories, run background Next.js / N
 - Edit and save `.env`, `servers.json`, and `targets.json` directly from your browser.
 - Dedicated configuration onboarding: no process management or control overhead in the web layer.
 
+### 6. Modular AI System Prompts (`prompts/`)
+- Fully customizable AI system prompts for executive manager reports, diagnostic log analysis, and smart chat operations.
+- Stored as plain text files in `prompts/` (`manager_report.txt`, `diagnose.txt`, `chat.txt`) and editable directly inside Tab [5] of the Web Setup Wizard.
+- Zero need to edit underlying Python code to tailor prompt tone, language, or reporting rules.
+
 ---
 
 ## Quick Start
