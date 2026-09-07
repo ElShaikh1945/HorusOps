@@ -24,7 +24,7 @@
 
 ## Overview
 
-**HorusOps** is an autonomous, open-source DevOps and infrastructure orchestration agent designed for production and developer environments. Inspired by the ancient Egyptian symbol of vigilance and protection (The Eye of Horus / Wedjat), HorusOps operates 24/7 to monitor processes, execute self-healing recoveries on crashed servers, automate Git repository commits with semantic AI analysis, and deliver a comprehensive command center straight to your phone via Telegram.
+**HorusOps** is an autonomous, Source-Available DevOps and infrastructure orchestration platform designed for production and developer environments. Inspired by the ancient Egyptian symbol of vigilance and protection (The Eye of Horus / Wedjat), HorusOps operates 24/7 to monitor processes, execute self-healing recoveries on crashed servers, automate Git repository commits with semantic AI analysis, and deliver a comprehensive command center straight to your phone via Telegram.
 
 HorusOps is **100% Terminal & CLI Native**:
 - **Zero Web Server Overhead**: No background HTTP daemons, no browser requirements, and no listening ports for configuration.
