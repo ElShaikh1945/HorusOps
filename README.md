@@ -13,6 +13,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
   <a href="README.ar.md"><img src="https://img.shields.io/badge/Language-Arabic%20Docs-2ea44f.svg?style=flat-square" alt="Arabic Documentation"></a>
+  <img src="https://img.shields.io/badge/Interface-100%25%20CLI%20%26%20Terminal-00d2ff.svg?style=flat-square" alt="100% CLI">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=flat-square" alt="Platform">
   <a href="https://t.me/HorusOps_chat"><img src="https://img.shields.io/badge/Telegram-Chat%20%26%20Support-24A1DE.svg?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Support"></a>
@@ -23,26 +24,27 @@
 
 ## Overview
 
-**HorusOps** is an autonomous, open-source DevOps and infrastructure orchestration agent. Named after the ancient Egyptian symbol of vigilance and protection (The Eye of Horus / Wedjat), HorusOps monitors development and production environments 24/7, executes self-healing recovery on failed processes, synchronizes Git repositories automatically with AI-generated semantic commit messages, and provides a full-featured, zero-telemetry control center directly via Telegram.
+**HorusOps** is an autonomous, open-source DevOps and infrastructure orchestration agent designed for production and developer environments. Inspired by the ancient Egyptian symbol of vigilance and protection (The Eye of Horus / Wedjat), HorusOps operates 24/7 to monitor processes, execute self-healing recoveries on crashed servers, automate Git repository commits with semantic AI analysis, and deliver a comprehensive command center straight to your phone via Telegram.
 
-Whether managing multiple microservices (Node.js, Next.js, FastAPI, Django, Vite, Go, Docker) on local developer machines or distributed VPS instances, HorusOps operates entirely locally with **zero cloud dependencies, zero external tracking, and end-to-end cryptographic control**.
+HorusOps is **100% Terminal & CLI Native**:
+- **Zero Web Server Overhead**: No background HTTP daemons, no browser requirements, and no listening ports for configuration.
+- **SSH & Headless Ready**: Designed from the ground up for remote VPS instances, cloud droplets, Linux servers, and local terminal workflows.
+- **Bilingual Interactive Onboarding**: Seamless step-by-step setup in both Arabic and English directly inside your terminal.
+- **Zero Telemetry**: All data remains strictly local with direct encrypted API communication.
 
 ---
 
 ## Architecture Diagram
-
-The following architecture diagram demonstrates the end-to-end interaction model between the Telegram operator, the HorusOps Core Daemon, the local process supervision engine, and the external AI/Git providers:
 
 ```mermaid
 flowchart TB
     subgraph Operator["Operator Interfaces"]
         TG_Mobile["Telegram Mobile App"]
         TG_Desktop["Telegram Desktop / Web"]
-        Web_Console["Web Setup Console\n(localhost:8585)"]
-        CLI_Term["Interactive CLI\n(install.sh --cli)"]
+        CLI_Wizard["Interactive Terminal Onboarding\n(./install.sh)"]
     end
 
-    subgraph HorusOps["HorusOps Core Engine (Local Execution)"]
+    subgraph HorusOps["HorusOps Core Engine (Local & Isolated)"]
         Router["Command Router & Rate Limiter\n(14 Strict Slash Commands)"]
         Supervisor["Process Supervisor\n(active_servers.json)"]
         Health["Telemetry & Health Checker\n(Ports, CPU, RAM, Disks)"]
@@ -53,14 +55,13 @@ flowchart TB
 
     subgraph External["External Services & Runtimes"]
         Groq["Groq AI API\n(Llama 3.3 Diagnostic Triage)"]
-        GitHub["GitHub Remotes\n(Git Push / CI Triggers)"]
-        DevServers["Managed Local Processes\n(Next.js, FastAPI, Express, Docker)"]
+        GitHub["GitHub Remotes\n(Secure Git Push / CI)"]
+        DevServers["Monitored Local Processes\n(Next.js, FastAPI, Express, Docker)"]
     end
 
     TG_Mobile <-->|Encrypted Bot API| Router
     TG_Desktop <-->|Encrypted Bot API| Router
-    Web_Console -->|HTTP Configuration| HorusOps
-    CLI_Term -->|Terminal I/O| HorusOps
+    CLI_Wizard -->|Generates .env, servers.json, targets.json| HorusOps
 
     Router --> Supervisor
     Router --> Health
@@ -71,7 +72,7 @@ flowchart TB
     Supervisor <-->|Heartbeat & Auto-Restart| DevServers
     Health <-->|OS System Metrics| DevServers
     Sync <-->|Fetch, Rebase, Push| GitHub
-    Router <-->|Incident Logs Triage| Groq
+    Router <-->|Incident Log Parsing| Groq
 ```
 
 ---
@@ -79,41 +80,41 @@ flowchart TB
 ## Core Capabilities
 
 ### 1. 24/7 Telegram Command & Telemetry Center
-- **14 Strict Slash Commands (No Underscores)**: Clean, unambiguous syntax (`/status`, `/diagnose`, `/managerreport`, `/servers`, `/server`, `/startserver`, `/stopserver`, `/restart`, `/build`, `/sync`, `/repos`, `/report`, `/clearcache`, `/help`).
-- **Interactive Inline Dashboards**: Real-time buttons for immediate server restart, process lifecycle toggling, and target builds.
-- **Voice Message Analysis**: Audio queries sent to the bot are transcribed and routed intelligently via the Groq AI model.
-- **Precision Auditing**: All responses and system messages feature microsecond execution timestamps (`HH:MM:SS`).
+- **14 Strict Slash Commands (No Underscores)**: `/status`, `/diagnose`, `/managerreport`, `/servers`, `/server`, `/startserver`, `/stopserver`, `/restart`, `/build`, `/sync`, `/repos`, `/report`, `/clearcache`, `/help`.
+- **Interactive Inline Keyboards**: Instant buttons for process control, server reboot, and target triggering.
+- **Voice Message Processing**: Real-time voice query transcription and execution via Groq AI.
+- **Auditing Timestamps**: Exact microsecond timestamps (`HH:MM:SS`) on all status reports and logs.
 
 ### 2. Autonomous Self-Healing & Process Supervisor (`servers.json`)
-- Continuously inspects active server states (`active_servers.json`) and listening network ports.
-- Automatically recovers and restarts crashed development and staging services.
-- Eliminates orphaned child processes during unexpected reboots or shell terminations.
+- Continuous health checks on active ports and process IDs.
+- Automatic recovery and reboot of crashed development and staging services.
+- Clean process termination to prevent zombie PIDs and blocked ports.
 
 ### 3. Automated Git Multi-Repository Synchronization
-- Recursively monitors local repository directories for file modifications.
-- Automatically resets, unstages, and excludes sensitive secrets (`*.env`, `*.key`, `*.pem`, `id_rsa*`) before staging.
-- Formulates clean, semantic Git commit messages using modular AI prompt logic.
-- Executes `git pull --rebase` and `git push` safely with comprehensive failure reporting.
+- Scans base directories recursively for Git repositories.
+- Automatic secret shielding: resets and unstages sensitive files (`*.env`, `*.key`, `*.pem`, `id_rsa*`) prior to commit.
+- Semantic commit message authoring via modular AI prompt logic.
+- Safe automated `git pull --rebase` and `git push` routines.
 
 ### 4. Native CI/CD Pipeline Engine (`targets.json`)
-- Triggers custom local or remote pipeline jobs (e.g., Docker deployments, Flutter builds, test suites, package publishing).
-- Delivers instantaneous pipeline logs and execution pass/fail metrics directly to Telegram.
+- Configurable pipeline targets (e.g., Docker deployments, Flutter builds, automated test suites, PyPI package releases).
+- Instant delivery of build logs and exit status codes directly to Telegram.
 
-### 5. Zero-Dependency Web Setup Console (`setup_wizard.py`)
-- Single-file setup wizard running purely on standard Python library (`http.server`).
-- Dynamic connection testers for Telegram (`getMe`), Groq (`models.list`), and GitHub (`/user`).
-- Integrated folder browser and automatic discovery for local servers and Git repositories.
+### 5. Interactive Terminal Configuration Engine (`setup_wizard.py`)
+- Zero dependencies: runs purely on Python standard library modules.
+- Live API validation for Telegram tokens, Groq keys, and GitHub access tokens.
+- Automatic Telegram User ID detection via incoming message polling.
+- Automatic framework and port discovery (Next.js, Vite, Django, FastAPI, Flask, Python scripts).
 
 ### 6. Modular AI System Prompts (`prompts/`)
-- Plain-text prompt configuration files in `prompts/`:
+- Plain-text prompt configurations in `prompts/`:
   - `manager_report.txt`: Executive operational summaries.
-  - `diagnose.txt`: Error log parsing and root cause extraction.
-  - `chat.txt`: Interactive terminal and conversational queries.
-- Editable via Web Wizard Tab [5] with one-click factory reset.
+  - `diagnose.txt`: Error log triage and root-cause extraction.
+  - `chat.txt`: Conversational ops assistance.
 
 ---
 
-## Quick Start
+## Quick Start (Interactive Terminal Onboarding)
 
 ### 1. Clone the Repository
 ```bash
@@ -121,88 +122,121 @@ git clone https://github.com/ElShaikh1945/HorusOps.git
 cd HorusOps
 ```
 
-### 2. Run Setup (Automated One-Step Installer)
-Run the automated installation script:
+### 2. Run the Interactive Installer
+Execute the automated setup script directly in your terminal:
 ```bash
 ./install.sh
 ```
 
-> **Headless / VPS Servers (No GUI)**: Launch the interactive terminal onboarding directly:
-> ```bash
-> ./install.sh --cli
-> ```
+### 3. Follow the Step-by-Step Terminal Prompts
 
-Open `http://localhost:8585` in your browser:
-1. **Telegram Bot Token**: Paste your token from `@BotFather` and click **Auto-Detect ID** (or send any message to your bot on Telegram).
-2. **Projects Directory**: Click **Browse Folder...** to select your development workspace (supports multiple paths).
-3. **Local Servers**: Click **Auto-Discover Servers** to detect active frameworks (Next.js, Vite, FastAPI, Django, etc.).
-4. (Optional) Enter your **Groq API Key** for AI incident triage and **GitHub Token** for CI/CD integration.
-5. Click **Save Settings**.
+```text
+====================================================================
+ [HORUS-OPS] Autonomous DevOps & Server Orchestration Platform
+ Interactive Terminal Configuration Wizard
+====================================================================
+Select Language / اختر لغة الإعداد:
+  [1] العربية (الافتراضية)
+  [2] English
+Option / الاختيار [1]: 2
+--------------------------------------------------------------------
+1. Telegram Bot Token: <Paste token from @BotFather>
+   [*] Verifying bot token with Telegram API...
+   [OK] Verified: HorusOpsBot (@HorusOps_bot)
+
+2. Telegram Numerical User/Chat ID:
+   Enter User ID or press Enter for auto-detect: <Press Enter>
+   [*] Polling incoming updates...
+   [OK] Auto-detected User ID: 123456789 (Muhammad)
+
+3. Projects Base Directory [/home/user/projects]: /var/www/apps
+   [*] Scanning repositories...
+   [OK] Discovered 4 Git repositories.
+
+4. Groq API Key for AI incident diagnostics (optional): gsk_...
+   [*] Testing Groq API key...
+   [OK] Groq API valid. Models available: 12
+
+5. GitHub Personal Access Token for CI/CD (optional): ghp_...
+   [*] Testing GitHub token...
+   [OK] GitHub authenticated as: @ElShaikh1945
+
+[*] Discovering local servers and runtimes...
+   [OK] Configured 3 server definition(s) in servers.json.
+
+====================================================================
+ [OK] Configuration saved successfully:
+   - .env (Encrypted local credentials)
+   - servers.json (Monitored server processes)
+   - targets.json (CI/CD pipeline targets)
+   - prompts/ (Modular AI system prompts)
+====================================================================
+```
 
 ---
 
 ## Service Execution & Management
 
-### Direct Execution
-Install dependencies:
+### Run Directly in Terminal
+Install requirements:
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the Telegram Bot Daemon:
+Launch the Telegram Bot Daemon:
 ```bash
 ./scripts/run_bot.sh
 ```
 
-Run Git Auto-Sync manually:
+Trigger Git Auto-Sync manually:
 ```bash
 ./scripts/run_sync.sh
 ```
 
 ---
 
-### Running as a Background Daemon (Auto-Start on Boot)
+### Running as a Persistent Background Daemon (Auto-Start on Boot)
+
+#### On Linux (`systemd`)
+Install the user-level systemd service:
+```bash
+./scripts/install_systemd.sh
+```
+- Service Status: `systemctl --user status waisoft-bot.service`
+- Restart Daemon: `systemctl --user restart waisoft-bot.service`
+- Live Logs: `journalctl --user -u waisoft-bot.service -f`
 
 #### On macOS (`launchd`)
 Install the persistent launch agent:
 ```bash
 ./scripts/install_launchd.sh
 ```
-- Real-time logs: `tail -f server_logs/bot_stdout.log`
-- Stop service: `launchctl stop com.waisoft.bot`
-- Unload service: `launchctl unload ~/Library/LaunchAgents/com.waisoft.bot.plist`
-
-#### On Linux (`systemd`)
-Install the persistent systemd user service:
-```bash
-./scripts/install_systemd.sh
-```
-- Status: `systemctl --user status waisoft-bot.service`
-- Restart: `systemctl --user restart waisoft-bot.service`
-- Logs: `journalctl --user -u waisoft-bot.service -f`
+- Live Logs: `tail -f server_logs/bot_stdout.log`
+- Stop Daemon: `launchctl stop com.waisoft.bot`
+- Unload Daemon: `launchctl unload ~/Library/LaunchAgents/com.waisoft.bot.plist`
 
 ---
 
 ## Telegram Bot Command Reference
 
-All slash commands operate with strict syntax (**no underscores**):
+All commands follow strict syntax (**no underscores**):
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
-| `/status` | Full health report: CPU, RAM, Disk, and Active Process states | `/status` |
-| `/managerreport` | Executive overview of Git progress, operational alerts, and uptime | `/managerreport` |
-| `/diagnose [target]` | AI-powered incident root-cause analysis on logs or system errors | `/diagnose backend` |
-| `/servers` | List all configured servers with live port status & action buttons | `/servers` |
-| `/server <name>` | Inspect process status, PID, and port health for a specific server | `/server web` |
-| `/startserver <name>` | Launch a configured server process | `/startserver web` |
-| `/stopserver <name>` | Terminate a running server process safely | `/stopserver web` |
-| `/restart <name>` | Reboot a running or stalled server process | `/restart web` |
-| `/build <target>` | Execute an automated CI/CD pipeline target | `/build mobile` |
-| `/sync` | Force immediate synchronization across all tracked Git repositories | `/sync` |
-| `/repos` | List all discovered Git repositories and remote branch sync status | `/repos` |
-| `/report` | Summary of today's Git commits, authors, and server uptime | `/report` |
+| `/status` | Full health telemetry: CPU, RAM, Disk space, and monitored servers | `/status` |
+| `/managerreport` | Executive summary of Git activity, operational alerts, and uptime | `/managerreport` |
+| `/diagnose [target]` | AI-powered incident triage and root-cause analysis on logs | `/diagnose backend` |
+| `/servers` | Interactive dashboard of all configured servers with action buttons | `/servers` |
+| `/server <name>` | Detailed status, PID, and port health for a specific process | `/server web` |
+| `/startserver <name>` | Start a configured server process | `/startserver web` |
+| `/stopserver <name>` | Stop a running server process safely | `/stopserver web` |
+| `/restart <name>` | Restart a running or stalled server process | `/restart web` |
+| `/build <target>` | Trigger an automated CI/CD pipeline target | `/build mobile` |
+| `/sync` | Force immediate synchronization cycle across all Git repositories | `/sync` |
+| `/repos` | List all tracked Git repositories and remote branch sync status | `/repos` |
+| `/report` | Daily summary of Git commits, authors, and server uptime | `/report` |
 | `/clearcache` | Flush diagnostic cache entries, error logs, and temporary state | `/clearcache` |
-| `/help` | Display interactive operational manual and syntax guide | `/help` |
+| `/help` | Display interactive command manual and syntax reference | `/help` |
 
 ---
 
@@ -269,12 +303,12 @@ SYNC_INTERVAL_MINUTES="30"
 
 ---
 
-## Security & Privacy Guarantee
+## Security & Privacy Architecture
 
-- **Zero External Telemetry**: HorusOps transmits telemetry only between your host and the official Telegram / Groq / GitHub endpoints configured by you.
-- **Leak-Proof Git Staging**: Built-in credential shields reset and unstage sensitive files (`*.env`, `*.key`, `*.pem`, `id_rsa*`) before Git operations execute.
-- **Admin Authentication Fence**: All operational commands require sender verification against `TELEGRAM_ADMIN_IDS`.
-- **Command Injection Prevention**: Subprocesses bypass raw shell string execution, passing tokenized arguments directly to process runtime boundaries.
+- **Zero External Telemetry**: All operations run locally on your host. Network calls are strictly limited to your configured Telegram, Groq, and GitHub endpoints.
+- **Leak-Proof Git Staging**: Automated credential guards unstage and reset sensitive files (`*.env`, `*.key`, `*.pem`, `id_rsa*`) before any commit is crafted.
+- **Admin Verification Fence**: Unauthorized Telegram user IDs are silently ignored.
+- **Safe Subprocess Spawning**: Commands execute with explicit tokenized argument vectors (`shell=False`) to eliminate command injection risks.
 
 ---
 
