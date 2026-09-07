@@ -466,19 +466,22 @@ def run_interactive_wizard():
         prompt_uid = f"   Enter User ID or press Enter for auto-detect [{def_user_id}]: "
 
     uid_input = input(prompt_uid).strip()
-    user_id = def_user_id
 
-    if not uid_input and not def_user_id:
+    if uid_input:
+        user_id = uid_input
+    else:
+        # User pressed Enter: attempt live auto-detection
         print("   [*] Polling incoming updates..." if not is_ar else "   [*] جاري فحص الرسائل الواردة للبوت لالتقاط المعرف...")
         det = detect_telegram_chat_id(token)
         if det.get("ok"):
             user_id = det["chat_id"]
             print(f"   [OK] Auto-detected User ID: {user_id} ({det.get('name')})")
+        elif def_user_id and def_user_id != "123456789":
+            user_id = def_user_id
+            print(f"   [INFO] Retained existing User ID: {user_id}")
         else:
             print(f"   [WARN] {det.get('error')}")
             user_id = input("   Enter User ID manually / أدخل المعرف يدوياً: ").strip()
-    elif uid_input:
-        user_id = uid_input
 
     # 3. Base Directory
     default_base = current_env.get("SYNC_BASE_DIR", str(Path.home() / "projects"))
