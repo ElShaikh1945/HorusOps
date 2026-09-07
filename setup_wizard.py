@@ -32,6 +32,58 @@ ENV_FILE = ROOT_DIR / ".env"
 SERVERS_FILE = ROOT_DIR / "servers.json"
 TARGETS_FILE = ROOT_DIR / "targets.json"
 CONFIG_FILE = ROOT_DIR / "config.toml"
+PROMPTS_DIR = ROOT_DIR / "prompts"
+
+DEFAULT_PROMPTS = {
+    "manager_report": (
+        "أنت مستشار تنفيذي تقني. المطلوب كتابة تقرير إنجاز يومي موجه لمدير غير تقني يغطي دورة العمل: {shift_label}.\n"
+        "شروط صارمة:\n"
+        "1. ممنوع تماماً استخدام مصطلحات برمجية جافة (لا تذكر git, commit, branch, diff, hash, terminal).\n"
+        "2. اكتب باختصار شديد وبشكل عملي: لخص ما تم إنجازه بنقاط واضحة (تحسينات الواجهة، إضافة ميزات، معالجة أخطاء، تجهيز بيئة العمل).\n"
+        "3. التنسيق:\n"
+        "[REPORT] تقرير إنجاز الأعمال اليومية\n"
+        "• دورة العمل: {shift_label}\n"
+        "• ملخص تنفيذي: سطر واحد موجز يوضح تقدم العمل.\n"
+        "• المشاريع المنجزة: اسم المشروع وتحته نقطتان أو ثلاث توضح الأعمال المكتملة بلغة الأعمال.\n"
+        "• الحالة: جاهز للمراجعة / قيد العمل."
+    ),
+    "diagnose": (
+        "أنت محرك تشخيص أخطاء تقني (Diagnostic Engine) متخصص في هندسة النظم والـ DevOps.\n"
+        "ردك تقني، مباشر، موجز، وخالٍ تماماً من أي إيموجيز أو مقدمات أو عبارات ترحيبية.\n"
+        "حلل السجلات المرفقة، حدد السبب الجذري للخطأ (Root Cause)، واقترح الحل العملي المباشر في نقاط محددة."
+    ),
+    "chat": (
+        "أنت محرك تحليل واستعلامات تشغيلي لنظام WAISoft-Reports.\n"
+        "قواعد صارمة لأسلوب الرد:\n"
+        "1. كن رسمياً، مهنياً، ومقتضباً إلى أقصى حد ممكن دون الإخلال بالمعلومة.\n"
+        "2. ادخل في صلب الإجابة مباشرة بنقاط محددة، أرقام دقيقة، ومسارات صريحة.\n"
+        "3. ممنوع تماماً أي عبارات ترحيبية، مجاملات، مقدمات، أو مشاعر.\n"
+        "4. اعتمد فقط على بيانات المشاريع الحقيقية المرفقة في السياق بدقة تامة.\n"
+        "5. راعِ سياق الرسائل السابقة المرفقة في التاريخ للإجابة دون طلب توضيح."
+    ),
+}
+
+
+def read_prompts() -> dict[str, str]:
+    prompts = {}
+    for k, default_text in DEFAULT_PROMPTS.items():
+        p_file = PROMPTS_DIR / f"{k}.txt"
+        if p_file.is_file():
+            try:
+                prompts[k] = p_file.read_text(encoding="utf-8").strip()
+                continue
+            except Exception:
+                pass
+        prompts[k] = default_text
+    return prompts
+
+
+def write_prompts(prompts: dict[str, str]) -> None:
+    PROMPTS_DIR.mkdir(parents=True, exist_ok=True)
+    for k, text in prompts.items():
+        if k in DEFAULT_PROMPTS and isinstance(text, str):
+            p_file = PROMPTS_DIR / f"{k}.txt"
+            p_file.write_text(text.strip(), encoding="utf-8")
 
 
 def get_free_port(start_port: int = 8585) -> int:
@@ -425,10 +477,13 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
             env_data = parse_env_file(ENV_FILE)
             servers_data = read_json_safe(SERVERS_FILE, {})
             targets_data = read_json_safe(TARGETS_FILE, {})
+            prompts_data = read_prompts()
             self._send_json(200, {
                 "env": env_data,
                 "servers": servers_data.get("servers", servers_data),
                 "targets": targets_data.get("targets", targets_data),
+                "prompts": prompts_data,
+                "default_prompts": DEFAULT_PROMPTS,
             })
         elif parsed.path == "/api/select_folder":
             folder = select_folder_native()
@@ -487,6 +542,7 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
                 env_in = body.get("env", {})
                 servers_in = body.get("servers", {})
                 targets_in = body.get("targets", {})
+                prompts_in = body.get("prompts", {})
 
                 write_env_file(ENV_FILE, env_in)
 
@@ -496,9 +552,12 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
                 with open(TARGETS_FILE, "w", encoding="utf-8") as f:
                     json.dump({"targets": targets_in}, f, ensure_ascii=False, indent=2)
 
+                if prompts_in and isinstance(prompts_in, dict):
+                    write_prompts(prompts_in)
+
                 self._send_json(200, {
                     "ok": True,
-                    "message": "تم حفظ الإعدادات بنجاح في .env و servers.json و targets.json. يمكنك الآن تشغيل البوت عبر: ./scripts/run_bot.sh"
+                    "message": "تم حفظ الإعدادات بنجاح في .env و servers.json و targets.json ومجلد prompts. يمكنك الآن تشغيل البوت عبر: ./scripts/run_bot.sh"
                 })
             except Exception as exc:
                 self._send_json(500, {"ok": False, "error": str(exc)})
@@ -571,6 +630,9 @@ HTML_PAGE = """<!DOCTYPE html>
       </button>
       <button onclick="switchTab(4)" id="tabBtn4" class="px-4 py-3 rounded-t-lg border-b-2 border-transparent hover:text-blue-400 transition text-slate-400 flex items-center gap-2">
         [4] خطوط البناء والـ CI/CD
+      </button>
+      <button onclick="switchTab(5)" id="tabBtn5" class="px-4 py-3 rounded-t-lg border-b-2 border-transparent hover:text-blue-400 transition text-slate-400 flex items-center gap-2">
+        [5] موجهات الذكاء الاصطناعي (AI Prompts)
       </button>
     </div>
 
@@ -762,6 +824,62 @@ HTML_PAGE = """<!DOCTYPE html>
       </div>
     </div>
 
+    <!-- Tab 5: AI System Prompts -->
+    <div id="tab5" class="space-y-6 hidden">
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="border-b border-slate-700/50 pb-4">
+          <h2 class="text-lg font-bold text-blue-400 flex items-center gap-2">
+            تخصيص موجهات النظام للذكاء الاصطناعي (AI System Prompts)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            يمكنك تخصيص الأسلوب، لغة التقرير، وشروط التحليل لكل وظيفة من وظائف الذكاء الاصطناعي. تُحفظ هذه الموجهات في مجلد <code class="text-amber-400 font-mono">prompts/</code> في جذر المشروع.
+          </p>
+        </div>
+
+        <!-- Prompt 1: Manager Report -->
+        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-200">1. موجه التقرير الإداري التنفيذي (/managerreport)</h3>
+              <p class="text-xs text-slate-400">يستخدم عند طلب تقرير ملخص لإنجاز اليوم موجه للإدارة. المتغير <code class="text-blue-400 font-mono">{shift_label}</code> يتم استبداله تلقائياً بتوقيت واسم الوردية.</p>
+            </div>
+            <button type="button" onclick="resetPrompt('manager_report')" class="text-xs text-slate-400 hover:text-blue-400 underline font-mono">
+              [استعادة الافتراضي]
+            </button>
+          </div>
+          <textarea id="promptManagerReport" rows="8" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 font-mono focus:border-blue-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- Prompt 2: Diagnostics -->
+        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-200">2. موجه تشخيص الأعطال وتحليل السجلات (/diagnose)</h3>
+              <p class="text-xs text-slate-400">يستخدم عند توقف أي خادم أو عند فحص أخطاء التشغيل وسجلات Logs لاقتراح الحل الجذري.</p>
+            </div>
+            <button type="button" onclick="resetPrompt('diagnose')" class="text-xs text-slate-400 hover:text-blue-400 underline font-mono">
+              [استعادة الافتراضي]
+            </button>
+          </div>
+          <textarea id="promptDiagnose" rows="6" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 font-mono focus:border-blue-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- Prompt 3: Smart Chat & Ops -->
+        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-200">3. موجه الاستعلامات الذكية والمحادثة الصوتية/النصية</h3>
+              <p class="text-xs text-slate-400">يحدد نبرة وقواعد الرد عندما يرسل المستخدم أسئلة أو رسائل صوتية حول حالة المشاريع والنظام.</p>
+            </div>
+            <button type="button" onclick="resetPrompt('chat')" class="text-xs text-slate-400 hover:text-blue-400 underline font-mono">
+              [استعادة الافتراضي]
+            </button>
+          </div>
+          <textarea id="promptChat" rows="6" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 font-mono focus:border-blue-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+      </div>
+    </div>
+
     <!-- Instructions Box -->
     <div class="mt-8 bg-slate-800/40 border border-slate-700/40 rounded-xl p-5 text-xs text-slate-400 space-y-2">
       <div class="font-bold text-slate-300 text-sm">[INFO] طريقة تشغيل وإدارة البوت بعد حفظ الإعدادات:</div>
@@ -798,17 +916,34 @@ HTML_PAGE = """<!DOCTYPE html>
     }
 
     function switchTab(index) {
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById(`tab${i}`).classList.add("hidden");
-        document.getElementById(`tabBtn${i}`).classList.remove("tab-active", "text-blue-400");
-        document.getElementById(`tabBtn${i}`).classList.add("text-slate-400");
+      for (let i = 1; i <= 5; i++) {
+        const t = document.getElementById(`tab${i}`);
+        const b = document.getElementById(`tabBtn${i}`);
+        if (t) t.classList.add("hidden");
+        if (b) {
+          b.classList.remove("tab-active", "text-blue-400");
+          b.classList.add("text-slate-400");
+        }
       }
-      document.getElementById(`tab${index}`).classList.remove("hidden");
-      document.getElementById(`tabBtn${index}`).classList.add("tab-active", "text-blue-400");
-      document.getElementById(`tabBtn${index}`).classList.remove("text-slate-400");
+      const activeTab = document.getElementById(`tab${index}`);
+      const activeBtn = document.getElementById(`tabBtn${index}`);
+      if (activeTab) activeTab.classList.remove("hidden");
+      if (activeBtn) {
+        activeBtn.classList.add("tab-active", "text-blue-400");
+        activeBtn.classList.remove("text-slate-400");
+      }
     }
 
-    let configState = { env: {}, servers: {}, targets: {} };
+    function resetPrompt(key) {
+      if (configState.default_prompts && configState.default_prompts[key]) {
+        if (key === "manager_report") document.getElementById("promptManagerReport").value = configState.default_prompts[key];
+        if (key === "diagnose") document.getElementById("promptDiagnose").value = configState.default_prompts[key];
+        if (key === "chat") document.getElementById("promptChat").value = configState.default_prompts[key];
+        showToast("تمت استعادة نص الموجه الافتراضي.");
+      }
+    }
+
+    let configState = { env: {}, servers: {}, targets: {}, prompts: {}, default_prompts: {} };
 
     async function loadInitialConfig() {
       try {
@@ -828,6 +963,11 @@ HTML_PAGE = """<!DOCTYPE html>
         if (env.SYNC_IGNORED_NAMES) document.getElementById("syncIgnored").value = env.SYNC_IGNORED_NAMES;
         if (env.SYNC_INTERVAL_MINUTES) document.getElementById("syncInterval").value = env.SYNC_INTERVAL_MINUTES;
         if (env.SYNC_PUSH) document.getElementById("syncPush").value = env.SYNC_PUSH;
+
+        const prompts = data.prompts || {};
+        if (prompts.manager_report) document.getElementById("promptManagerReport").value = prompts.manager_report;
+        if (prompts.diagnose) document.getElementById("promptDiagnose").value = prompts.diagnose;
+        if (prompts.chat) document.getElementById("promptChat").value = prompts.chat;
 
         renderServers(data.servers || {});
         renderTargets(data.targets || {});
@@ -1172,11 +1312,17 @@ HTML_PAGE = """<!DOCTYPE html>
         }
       });
 
+      const prompts = {
+        manager_report: document.getElementById("promptManagerReport") ? document.getElementById("promptManagerReport").value.trim() : "",
+        diagnose: document.getElementById("promptDiagnose") ? document.getElementById("promptDiagnose").value.trim() : "",
+        chat: document.getElementById("promptChat") ? document.getElementById("promptChat").value.trim() : "",
+      };
+
       try {
         const res = await fetch("/api/save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ env, servers, targets }),
+          body: JSON.stringify({ env, servers, targets, prompts }),
         });
         const data = await res.json();
         if (data.ok) {
@@ -1329,9 +1475,9 @@ def main():
         return
 
     port = get_free_port(args.port)
-    socketserver.TCPServer.allow_reuse_address = True
     server_address = ("127.0.0.1", port)
-    httpd = socketserver.TCPServer(server_address, SetupRequestHandler)
+    httpd = http.server.ThreadingHTTPServer(server_address, SetupRequestHandler)
+    httpd.daemon_threads = True
     url = f"http://localhost:{port}"
 
     print("=" * 65)

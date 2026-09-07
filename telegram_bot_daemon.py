@@ -46,6 +46,21 @@ def is_authorized(from_id: int | None) -> bool:
         return False
     return from_id in AUTHORIZED_USER_IDS
 
+ROOT_DIR = Path(__file__).resolve().parent
+PROMPTS_DIR = ROOT_DIR / "prompts"
+
+def load_system_prompt(name: str, default: str) -> str:
+    env_key = f"PROMPT_{name.upper()}"
+    if env.get(env_key):
+        return env[env_key].strip()
+    p_file = PROMPTS_DIR / f"{name}.txt"
+    if p_file.exists():
+        try:
+            return p_file.read_text(encoding="utf-8").strip()
+        except Exception:
+            pass
+    return default.strip()
+
 GROQ_API_KEY = env.get("GROQ_API_KEY", "")
 GROQ_MODEL = env.get("GROQ_MODEL", "qwen/qwen3.8-27b")
 
@@ -619,18 +634,19 @@ def handle_manager_report(chat_id: int, target_project: str | None = None, menu_
 
     raw_summary = "\n---\n".join(summary_lines)
 
-    system_prompt = (
-        "أنت مستشار تنفيذي تقني. المطلوب كتابة تقرير إنجاز يومي موجه لمدير غير تقني يغطي دورة العمل اليومية التي تبدأ الساعة 3:00 فجراً.\n"
+    default_report_prompt = (
+        "أنت مستشار تنفيذي تقني. المطلوب كتابة تقرير إنجاز يومي موجه لمدير غير تقني يغطي دورة العمل: {shift_label}.\n"
         "شروط صارمة:\n"
-        "1. ممنوع تماماً استخدام أي مصطلحات برمجية جافة (لا تذكر git, commit, branch, diff, hash, terminal).\n"
-        "2. اكتب باختصار شديد وبشكل غير مخل: لخص ما تم إنجازه اليوم بنقاط عملية وواضحة (تحسينات الواجهة، إضافة صفحات، معالجة أخطاء، تجهيز بيئة العمل).\n"
-        "3. التنسيق بدون أي علامات markdown معقدة (لا تستخدم أقواس أو نجوم):\n"
+        "1. ممنوع تماماً استخدام مصطلحات برمجية جافة (لا تذكر git, commit, branch, diff, hash, terminal).\n"
+        "2. اكتب باختصار شديد وبشكل عملي: لخص ما تم إنجازه بنقاط واضحة (تحسينات الواجهة، إضافة ميزات، معالجة أخطاء، تجهيز بيئة العمل).\n"
+        "3. التنسيق:\n"
         "[REPORT] تقرير إنجاز الأعمال اليومية\n"
-        f"• دورة العمل: {shift_label}.\n"
-        "• ملخص تنفيذي: سطر واحد موجز يوضح تقدم اليوم.\n"
-        "• المشاريع المنجزة: اسم المشروع وتحته نقطتان أو ثلاث فقط توضح الأعمال المكتملة بلغة الأعمال.\n"
+        "• دورة العمل: {shift_label}\n"
+        "• ملخص تنفيذي: سطر واحد موجز يوضح تقدم العمل.\n"
+        "• المشاريع المنجزة: اسم المشروع وتحته نقطتان أو ثلاث توضح الأعمال المكتملة بلغة الأعمال.\n"
         "• الحالة: جاهز للمراجعة / قيد العمل."
     )
+    system_prompt = load_system_prompt("manager_report", default_report_prompt).replace("{shift_label}", shift_label)
 
     report = call_groq_ai(f"البيانات:\n{raw_summary}", system_prompt=system_prompt)
     if not report:
@@ -1197,7 +1213,9 @@ def handle_ai_diagnose(chat_id: int, target: str = "") -> None:
         f"3. [FIX] *الحل المقترح (Recommended Fix):* الأمر أو الخطوات الدقيقة لتصحيح المشكلة فوراً."
     )
 
-    reply = call_groq_ai(prompt, system_prompt="أنت محرك تشخيص أخطاء تقني (Diagnostic Engine). ردك تقني، مباشر، موجز، وخالٍ تماماً من أي إيموجيز أو مقدمات أو عبارات ترحيبية. ممنوع أن تظهر كشات أو مساعد ذكي.")
+    default_diag = "أنت محرك تشخيص أخطاء تقني (Diagnostic Engine) متخصص في هندسة النظم والـ DevOps. ردك تقني، مباشر، موجز، وخالٍ تماماً من أي إيموجيز أو مقدمات أو عبارات ترحيبية. ممنوع أن تظهر كشات أو مساعد ذكي."
+    diag_system_prompt = load_system_prompt("diagnose", default_diag)
+    reply = call_groq_ai(prompt, system_prompt=diag_system_prompt)
     if wait_id:
         delete_telegram_message(chat_id, wait_id)
 
@@ -1898,15 +1916,16 @@ def handle_smart_chat(chat_id: int, user_text: str) -> None:
     history = memory.load()
     context = gather_work_context(user_text, history)
 
-    system_prompt = (
+    default_chat_prompt = (
         "أنت محرك تحليل واستعلامات تشغيلي لنظام WAISoft-Reports.\n"
-        "قواعد صارمة جداً لأسلوب الرد:\n"
-        "1. كن رسمياً، مهنياً، ومقتضباً إلى أقصى حد ممكن (بدون إخلال بالمعلومة المطلوبة).\n"
+        "قواعد صارمة لأسلوب الرد:\n"
+        "1. كن رسمياً، مهنياً، ومقتضباً إلى أقصى حد ممكن دون الإخلال بالمعلومة.\n"
         "2. ادخل في صلب الإجابة مباشرة بنقاط محددة، أرقام دقيقة، ومسارات صريحة.\n"
-        "3. ممنوع تماماً أي عبارات ترحيبية، مجاملات، مقدمات، أو مشاعر ودية (المستخدم أكد صراحة: 'هو مش هيصاحبني').\n"
+        "3. ممنوع تماماً أي عبارات ترحيبية، مجاملات، مقدمات، أو مشاعر.\n"
         "4. اعتمد فقط على بيانات المشاريع الحقيقية المرفقة في السياق بدقة تامة.\n"
         "5. راعِ سياق الرسائل السابقة المرفقة في التاريخ للإجابة دون طلب توضيح."
     )
+    system_prompt = load_system_prompt("chat", default_chat_prompt)
 
     prompt = (
         f"سؤال المستخدم:\n{user_text}\n\n"
