@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# WAISoft-Reports | Automated One-Step Installer & Setup Launcher
+# HorusOps | Automated One-Step Installer & Setup Launcher
 set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 
 echo "=================================================="
-echo "      WAISoft-Reports Installation & Setup"
+echo "      HorusOps Installation & Setup"
 echo "=================================================="
 
 # Check Python 3

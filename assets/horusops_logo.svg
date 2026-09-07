@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="goldAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="500" height="500" rx="40" fill="#090d16" />
+
+  <!-- Background Cyber Circuit Grid Grid (Subtle) -->
+  <g stroke="#1e293b" stroke-width="1.5" opacity="0.4">
+    <path d="M50 120 H120 V200" fill="none" />
+    <path d="M450 120 H380 V200" fill="none" />
+    <path d="M100 400 H160 V340" fill="none" />
+    <path d="M400 400 H340 V340" fill="none" />
+    <circle cx="120" cy="200" r="3" fill="#38bdf8" />
+    <circle cx="380" cy="200" r="3" fill="#38bdf8" />
+    <circle cx="160" cy="340" r="3" fill="#f59e0b" />
+    <circle cx="340" cy="340" r="3" fill="#f59e0b" />
+  </g>
+
+  <!-- Tech Eyebrow / Overhead Arch -->
+  <path d="M120 165 L250 115 L380 165 L365 185 L250 142 L135 185 Z" fill="url(#cyanGlow)" />
+  <path d="M150 198 L250 160 L350 198" fill="none" stroke="url(#goldAccent)" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Upper Eye Outline -->
+  <path d="M110 240 C170 170 330 170 390 240" fill="none" stroke="url(#cyanGlow)" stroke-width="12" stroke-linecap="round" filter="url(#glow)" />
+  
+  <!-- Lower Eye Outline -->
+  <path d="M110 240 C180 305 320 305 390 240" fill="none" stroke="url(#cyanGlow)" stroke-width="8" stroke-linecap="round" />
+
+  <!-- Pupil / Central Core (DevOps / Telemetry Node) -->
+  <circle cx="250" cy="238" r="48" fill="#0f172a" stroke="url(#cyanGlow)" stroke-width="6" />
+  <circle cx="250" cy="238" r="28" fill="#0284c7" opacity="0.6" filter="url(#glow)" />
+  <circle cx="250" cy="238" r="14" fill="#38bdf8" />
+  <circle cx="250" cy="238" r="5" fill="#ffffff" />
+  
+  <!-- Telemetry Scanner Reticle / Crosshairs -->
+  <g stroke="url(#goldAccent)" stroke-width="3" opacity="0.8">
+    <line x1="250" y1="195" x2="250" y2="208" stroke-linecap="round" />
+    <line x1="250" y1="268" x2="250" y2="281" stroke-linecap="round" />
+    <line x1="207" y1="238" x2="220" y2="238" stroke-linecap="round" />
+    <line x1="280" y1="238" x2="293" y2="238" stroke-linecap="round" />
+  </g>
+
+  <!-- Eye of Horus Tear / Vertical Stem (Circuit Board Track) -->
+  <path d="M315 270 L315 375 L295 355 L295 282" fill="url(#cyanGlow)" />
+  <!-- Circuit Nodes on Stem -->
+  <circle cx="315" cy="375" r="5" fill="#38bdf8" />
+  <line x1="335" y1="285" x2="335" y2="350" stroke="url(#goldAccent)" stroke-width="3" stroke-linecap="round" />
+  <circle cx="335" cy="350" r="4" fill="#f59e0b" />
+
+  <!-- Eye of Horus Spiral / Falcon Marking (Cyber Curve) -->
+  <path d="M220 285 C190 320 145 320 135 285 C125 250 160 220 180 230" fill="none" stroke="url(#cyanGlow)" stroke-width="9" stroke-linecap="round" />
+  <circle cx="180" cy="230" r="5" fill="#38bdf8" />
+
+  <!-- Secondary Parallel Decorative Cyber Trace -->
+  <path d="M205 315 C175 345 130 340 120 310" fill="none" stroke="url(#goldAccent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 6" />
+</svg>

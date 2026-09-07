@@ -1917,7 +1917,7 @@ def handle_smart_chat(chat_id: int, user_text: str) -> None:
     context = gather_work_context(user_text, history)
 
     default_chat_prompt = (
-        "أنت محرك تحليل واستعلامات تشغيلي لنظام WAISoft-Reports.\n"
+        "أنت محرك تحليل واستعلامات تشغيلي لنظام HorusOps.\n"
         "قواعد صارمة لأسلوب الرد:\n"
         "1. كن رسمياً، مهنياً، ومقتضباً إلى أقصى حد ممكن دون الإخلال بالمعلومة.\n"
         "2. ادخل في صلب الإجابة مباشرة بنقاط محددة، أرقام دقيقة، ومسارات صريحة.\n"

@@ -1,67 +1,115 @@
-# WAISoft-Reports
+<p align="center">
+  <img src="assets/horusops_minimal.svg" alt="HorusOps Logo" width="130" height="130" />
+</p>
+
+<h1 align="center">HorusOps</h1>
 
 <p align="center">
-  <b>Production-Grade Git Automation, Server Process Orchestration, CI/CD Engine & Telegram AI Control Center</b>
+  <b>Autonomous Self-Healing DevOps Platform, Git Auto-Sync & AI-Driven Server Orchestrator via Telegram</b>
   <br>
-  <a href="README.ar.md">[AR] اقرأ هذا الدليل باللغة العربية</a>
+  <a href="README.ar.md"><strong>[العربية] اقرأ دليل التشغيل الكامل باللغة العربية</strong></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat&logo=python&logoColor=white" alt="Python 3.10+" />
-  <img src="https://img.shields.io/badge/Telegram-Bot%20API-24A1DE.svg?style=flat&logo=telegram&logoColor=white" alt="Telegram API" />
-  <img src="https://img.shields.io/badge/AI-Groq%20Llama%203.3-F55036.svg?style=flat" alt="Groq AI" />
-  <img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="MIT License" />
-  <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-lightgrey.svg?style=flat" alt="macOS & Linux" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
+  <a href="README.ar.md"><img src="https://img.shields.io/badge/Language-Arabic%20Docs-2ea44f.svg?style=flat-square" alt="Arabic Documentation"></a>
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=flat-square" alt="Platform">
+  <a href="https://t.me/HorusOps_chat"><img src="https://img.shields.io/badge/Telegram-Chat%20%26%20Support-24A1DE.svg?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Support"></a>
+  <a href="https://t.me/HorusOps"><img src="https://img.shields.io/badge/Telegram-News%20Channel-0088cc.svg?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Channel"></a>
 </p>
 
 ---
 
 ## Overview
 
-**WAISoft-Reports** is an all-in-one DevOps and engineering companion designed to eliminate repetitive Git tasks, monitor local and remote servers, run build and CI/CD pipelines, and provide an intelligent **Telegram AI Operations Center** directly on your phone.
+**HorusOps** is an autonomous, open-source DevOps and infrastructure orchestration agent. Named after the ancient Egyptian symbol of vigilance and protection (The Eye of Horus / Wedjat), HorusOps monitors development and production environments 24/7, executes self-healing recovery on failed processes, synchronizes Git repositories automatically with AI-generated semantic commit messages, and provides a full-featured, zero-telemetry control center directly via Telegram.
 
-Whether you manage multiple development repositories, run background Next.js / Node.js / Python servers, or need real-time push alerts and voice query diagnostics via Telegram, WAISoft-Reports handles it securely with **zero external telemetry and 100% local execution**.
+Whether managing multiple microservices (Node.js, Next.js, FastAPI, Django, Vite, Go, Docker) on local developer machines or distributed VPS instances, HorusOps operates entirely locally with **zero cloud dependencies, zero external tracking, and end-to-end cryptographic control**.
 
 ---
 
-## Key Features
+## Architecture Diagram
 
-### 1. Telegram Operations & Automated Diagnostics
-- **14 Strict Slash Commands (No Underscores)**: Clean, user-friendly commands such as `/status`, `/diagnose`, `/managerreport`, `/servers`, `/server`, `/restart`, `/build`, `/sync`, `/repos`, and `/help`.
-- **Groq AI Integration**: Automated log diagnostics, root-cause analysis, and natural-language voice query understanding.
-- **Interactive Inline Keyboards**: One-tap server control, target build triggering, and diagnostic drills.
-- **Exact Timestamps**: Every command and status report outputs precise `HH:MM:SS` execution timestamps.
-- **Hardware & Disk Monitors**: Real-time tracking of CPU, RAM, and Disk space across macOS and Linux mount points.
+The following architecture diagram demonstrates the end-to-end interaction model between the Telegram operator, the HorusOps Core Daemon, the local process supervision engine, and the external AI/Git providers:
 
-### 2. Automated Git Multi-Repo Synchronization
-- Scans base directories dynamically for Git repositories.
-- Detects uncommitted changes, stages files intelligently, and crafts contextual AI commit messages.
-- Pulls with `--rebase` and pushes to remote with detailed execution logs.
+```mermaid
+flowchart TB
+    subgraph Operator["Operator Interfaces"]
+        TG_Mobile["Telegram Mobile App"]
+        TG_Desktop["Telegram Desktop / Web"]
+        Web_Console["Web Setup Console\n(localhost:8585)"]
+        CLI_Term["Interactive CLI\n(install.sh --cli)"]
+    end
 
-### 3. Server Process Orchestrator (`servers.json`)
-- Manages local development servers (Next.js, Vite, Flask, FastAPI, Django, Express, etc.).
-- Active server tracking (`active_servers.json`) with PID management, port health checks, and automatic restart on crash.
-- Dynamic project discovery: Matches aliases, directories, and target port numbers.
+    subgraph HorusOps["HorusOps Core Engine (Local Execution)"]
+        Router["Command Router & Rate Limiter\n(14 Strict Slash Commands)"]
+        Supervisor["Process Supervisor\n(active_servers.json)"]
+        Health["Telemetry & Health Checker\n(Ports, CPU, RAM, Disks)"]
+        Sync["Git Auto-Sync Engine\n(Multi-Repo Change Scanner)"]
+        CICD["CI/CD Target Runner\n(targets.json)"]
+        Prompts["Modular System Prompts\n(prompts/*.txt)"]
+    end
 
-### 4. CI/CD Pipeline Engine (`targets.json`)
-- Define local or remote build pipelines (e.g., Flutter release, Docker build, PyPI publish, npm test).
-- Pre-flight checks, dependency verification, and build artifact logging.
-- Instant Telegram notifications on pipeline success or failure with execution logs.
+    subgraph External["External Services & Runtimes"]
+        Groq["Groq AI API\n(Llama 3.3 Diagnostic Triage)"]
+        GitHub["GitHub Remotes\n(Git Push / CI Triggers)"]
+        DevServers["Managed Local Processes\n(Next.js, FastAPI, Express, Docker)"]
+    end
+
+    TG_Mobile <-->|Encrypted Bot API| Router
+    TG_Desktop <-->|Encrypted Bot API| Router
+    Web_Console -->|HTTP Configuration| HorusOps
+    CLI_Term -->|Terminal I/O| HorusOps
+
+    Router --> Supervisor
+    Router --> Health
+    Router --> Sync
+    Router --> CICD
+    Router <--> Prompts
+
+    Supervisor <-->|Heartbeat & Auto-Restart| DevServers
+    Health <-->|OS System Metrics| DevServers
+    Sync <-->|Fetch, Rebase, Push| GitHub
+    Router <-->|Incident Logs Triage| Groq
+```
+
+---
+
+## Core Capabilities
+
+### 1. 24/7 Telegram Command & Telemetry Center
+- **14 Strict Slash Commands (No Underscores)**: Clean, unambiguous syntax (`/status`, `/diagnose`, `/managerreport`, `/servers`, `/server`, `/startserver`, `/stopserver`, `/restart`, `/build`, `/sync`, `/repos`, `/report`, `/clearcache`, `/help`).
+- **Interactive Inline Dashboards**: Real-time buttons for immediate server restart, process lifecycle toggling, and target builds.
+- **Voice Message Analysis**: Audio queries sent to the bot are transcribed and routed intelligently via the Groq AI model.
+- **Precision Auditing**: All responses and system messages feature microsecond execution timestamps (`HH:MM:SS`).
+
+### 2. Autonomous Self-Healing & Process Supervisor (`servers.json`)
+- Continuously inspects active server states (`active_servers.json`) and listening network ports.
+- Automatically recovers and restarts crashed development and staging services.
+- Eliminates orphaned child processes during unexpected reboots or shell terminations.
+
+### 3. Automated Git Multi-Repository Synchronization
+- Recursively monitors local repository directories for file modifications.
+- Automatically resets, unstages, and excludes sensitive secrets (`*.env`, `*.key`, `*.pem`, `id_rsa*`) before staging.
+- Formulates clean, semantic Git commit messages using modular AI prompt logic.
+- Executes `git pull --rebase` and `git push` safely with comprehensive failure reporting.
+
+### 4. Native CI/CD Pipeline Engine (`targets.json`)
+- Triggers custom local or remote pipeline jobs (e.g., Docker deployments, Flutter builds, test suites, package publishing).
+- Delivers instantaneous pipeline logs and execution pass/fail metrics directly to Telegram.
 
 ### 5. Zero-Dependency Web Setup Console (`setup_wizard.py`)
-- Standalone single-file setup application running on standard Python libraries (`http.server`).
-- Modern, responsive Tailwind CSS UI accessible at `http://localhost:8585`.
-- **Live Connection Testers**:
-  - Test Telegram Bot Token & Chat ID (`getMe` API check)
-  - Test Groq API Key (`models.list` API check)
-  - Test GitHub Token (`/user` API check)
-- Edit and save `.env`, `servers.json`, and `targets.json` directly from your browser.
-- Dedicated configuration onboarding: no process management or control overhead in the web layer.
+- Single-file setup wizard running purely on standard Python library (`http.server`).
+- Dynamic connection testers for Telegram (`getMe`), Groq (`models.list`), and GitHub (`/user`).
+- Integrated folder browser and automatic discovery for local servers and Git repositories.
 
 ### 6. Modular AI System Prompts (`prompts/`)
-- Fully customizable AI system prompts for executive manager reports, diagnostic log analysis, and smart chat operations.
-- Stored as plain text files in `prompts/` (`manager_report.txt`, `diagnose.txt`, `chat.txt`) and editable directly inside Tab [5] of the Web Setup Wizard.
-- Zero need to edit underlying Python code to tailor prompt tone, language, or reporting rules.
+- Plain-text prompt configuration files in `prompts/`:
+  - `manager_report.txt`: Executive operational summaries.
+  - `diagnose.txt`: Error log parsing and root cause extraction.
+  - `chat.txt`: Interactive terminal and conversational queries.
+- Editable via Web Wizard Tab [5] with one-click factory reset.
 
 ---
 
@@ -69,25 +117,26 @@ Whether you manage multiple development repositories, run background Next.js / N
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/WAISoft-Reports.git
-cd WAISoft-Reports
+git clone https://github.com/ElShaikh1945/HorusOps.git
+cd HorusOps
 ```
 
-### 2. Run Setup (One-Step Installer)
-Run the installer script (automatically verifies dependencies and launches the setup wizard):
+### 2. Run Setup (Automated One-Step Installer)
+Run the automated installation script:
 ```bash
 ./install.sh
 ```
-> **For VPS / Headless servers**: Run with `--cli` for an interactive terminal onboarding:
+
+> **Headless / VPS Servers (No GUI)**: Launch the interactive terminal onboarding directly:
 > ```bash
 > ./install.sh --cli
 > ```
 
-Open **`http://localhost:8585`** in your browser:
+Open `http://localhost:8585` in your browser:
 1. **Telegram Bot Token**: Paste your token from `@BotFather` and click **Auto-Detect ID** (or send any message to your bot on Telegram).
-2. **Projects Directory**: Click **Browse Folder...** to choose your repository root (supports multiple paths separated by comma).
-3. **Local Servers**: Click **Auto-Discover Servers** to automatically detect your local development servers (Next.js, Vite, FastAPI, etc.).
-4. (Optional) Enter your **Groq API Key** for AI diagnostic reports and **GitHub Token** for CI/CD.
+2. **Projects Directory**: Click **Browse Folder...** to select your development workspace (supports multiple paths).
+3. **Local Servers**: Click **Auto-Discover Servers** to detect active frameworks (Next.js, Vite, FastAPI, Django, etc.).
+4. (Optional) Enter your **Groq API Key** for AI incident triage and **GitHub Token** for CI/CD integration.
 5. Click **Save Settings**.
 
 ---
@@ -105,7 +154,7 @@ Run the Telegram Bot Daemon:
 ./scripts/run_bot.sh
 ```
 
-Run Git Auto Sync manually:
+Run Git Auto-Sync manually:
 ```bash
 ./scripts/run_sync.sh
 ```
@@ -115,16 +164,16 @@ Run Git Auto Sync manually:
 ### Running as a Background Daemon (Auto-Start on Boot)
 
 #### On macOS (`launchd`)
-We provide a ready-to-use launchd service:
+Install the persistent launch agent:
 ```bash
 ./scripts/install_launchd.sh
 ```
-- Logs: `server_logs/bot_stdout.log` and `server_logs/bot_stderr.log`
+- Real-time logs: `tail -f server_logs/bot_stdout.log`
 - Stop service: `launchctl stop com.waisoft.bot`
 - Unload service: `launchctl unload ~/Library/LaunchAgents/com.waisoft.bot.plist`
 
 #### On Linux (`systemd`)
-For systemd-based Linux systems:
+Install the persistent systemd user service:
 ```bash
 ./scripts/install_systemd.sh
 ```
@@ -134,58 +183,53 @@ For systemd-based Linux systems:
 
 ---
 
-## Telegram Bot Commands Reference
+## Telegram Bot Command Reference
 
-All commands follow strict syntax guidelines **without underscores**:
+All slash commands operate with strict syntax (**no underscores**):
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
-| `/status` | Full system health report (CPU, RAM, Disks, Active Servers) | `/status` |
-| `/managerreport` | Comprehensive manager summary (Git activity, servers, alerts) | `/managerreport` |
-| `/diagnose [target]` | AI-powered diagnosis of server logs or system errors | `/diagnose backend` |
-| `/servers` | List all configured servers with live status & interactive keyboard | `/servers` |
-| `/server <name>` | Detailed status and port check for a specific server | `/server api` |
-| `/startserver <name>` | Start a configured server process | `/startserver web` |
-| `/stopserver <name>` | Stop a running server process | `/stopserver web` |
-| `/restart <name>` | Restart a running or failed server process | `/restart web` |
-| `/build <target>` | Trigger a configured CI/CD build target | `/build mobile` |
-| `/sync` | Trigger an immediate Git auto-sync across all repositories | `/sync` |
-| `/repos` | List all discovered repositories and their current Git status | `/repos` |
-| `/report` | Quick daily report of Git commits and server uptime | `/report` |
-| `/clearcache` | Clear temporary diagnostic caches and error logs | `/clearcache` |
-| `/help` | Display interactive command manual and usage tips | `/help` |
-
-> **Voice Commands**: Send a voice note to the bot! If Groq AI is enabled, the bot will transcribe the voice query and execute the corresponding command or answer intelligently.
+| `/status` | Full health report: CPU, RAM, Disk, and Active Process states | `/status` |
+| `/managerreport` | Executive overview of Git progress, operational alerts, and uptime | `/managerreport` |
+| `/diagnose [target]` | AI-powered incident root-cause analysis on logs or system errors | `/diagnose backend` |
+| `/servers` | List all configured servers with live port status & action buttons | `/servers` |
+| `/server <name>` | Inspect process status, PID, and port health for a specific server | `/server web` |
+| `/startserver <name>` | Launch a configured server process | `/startserver web` |
+| `/stopserver <name>` | Terminate a running server process safely | `/stopserver web` |
+| `/restart <name>` | Reboot a running or stalled server process | `/restart web` |
+| `/build <target>` | Execute an automated CI/CD pipeline target | `/build mobile` |
+| `/sync` | Force immediate synchronization across all tracked Git repositories | `/sync` |
+| `/repos` | List all discovered Git repositories and remote branch sync status | `/repos` |
+| `/report` | Summary of today's Git commits, authors, and server uptime | `/report` |
+| `/clearcache` | Flush diagnostic cache entries, error logs, and temporary state | `/clearcache` |
+| `/help` | Display interactive operational manual and syntax guide | `/help` |
 
 ---
 
-## Configuration Details
+## Configuration Reference
 
 ### 1. Environment Variables (`.env`)
-Copy `.env.example` to `.env` or use the Web Wizard:
-
 ```ini
-# Telegram Configuration
+# Telegram Authentication
 TELEGRAM_BOT_TOKEN="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
 TELEGRAM_CHAT_ID="123456789"
 TELEGRAM_ADMIN_IDS="123456789"
 
-# AI Integration (Groq)
+# AI Incident Analysis (Groq)
 GROQ_API_KEY="gsk_xxxxxxxxxxxxxxxxxxxxxx"
 GROQ_MODEL="llama-3.3-70b-versatile"
 
-# GitHub Integration
+# GitHub Token
 GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxx"
 
-# Git Auto Sync Settings
+# Git Auto-Sync Policy
 SYNC_BASE_DIR="/path/to/your/projects"
 SYNC_IGNORED_NAMES=".git,node_modules,dist,build,.venv"
 SYNC_PUSH="true"
 SYNC_INTERVAL_MINUTES="30"
 ```
 
-### 2. Server Configuration (`servers.json`)
-Define servers that the bot can monitor and orchestrate:
+### 2. Server Process Specifications (`servers.json`)
 ```json
 {
   "web": {
@@ -205,8 +249,7 @@ Define servers that the bot can monitor and orchestrate:
 }
 ```
 
-### 3. CI/CD Build Targets (`targets.json`)
-Define automated build targets:
+### 3. Pipeline Build Targets (`targets.json`)
 ```json
 {
   "mobile-release": {
@@ -226,28 +269,25 @@ Define automated build targets:
 
 ---
 
-## Security & Privacy Architecture
+## Security & Privacy Guarantee
 
-- **Zero Hardcoded Secrets**: All tokens, keys, and IDs are isolated in `.env`, which is strictly excluded in `.gitignore`.
-- **Sandboxed Local Execution**: The bot runs entirely on your local machine or server. No intermediary proxy or telemetry server is contacted.
-- **Admin ID Whitelisting**: Set `TELEGRAM_ADMIN_IDS` to restrict bot commands to authorized Telegram users only.
-- **Safe Process Spawning**: Subprocess execution validates commands and uses process isolation to prevent shell injection.
+- **Zero External Telemetry**: HorusOps transmits telemetry only between your host and the official Telegram / Groq / GitHub endpoints configured by you.
+- **Leak-Proof Git Staging**: Built-in credential shields reset and unstage sensitive files (`*.env`, `*.key`, `*.pem`, `id_rsa*`) before Git operations execute.
+- **Admin Authentication Fence**: All operational commands require sender verification against `TELEGRAM_ADMIN_IDS`.
+- **Command Injection Prevention**: Subprocesses bypass raw shell string execution, passing tokenized arguments directly to process runtime boundaries.
 
 ---
 
-## Contributing
+## Community, News & Support
 
-Contributions, issues, and feature requests are welcome!
-Feel free to check [issues page](https://github.com/your-username/WAISoft-Reports/issues).
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- **Telegram Support & Discussion**: [t.me/HorusOps_chat](https://t.me/HorusOps_chat)
+- **Telegram Updates Channel**: [t.me/HorusOps](https://t.me/HorusOps)
+- **Official Repository**: [github.com/ElShaikh1945/HorusOps](https://github.com/ElShaikh1945/HorusOps)
+- **Issue Tracker**: [github.com/ElShaikh1945/HorusOps/issues](https://github.com/ElShaikh1945/HorusOps/issues)
+- **Author**: Muhammad Al-Shaikh ([muhammad.al-shaikh@outlook.com](mailto:muhammad.al-shaikh@outlook.com))
 
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.

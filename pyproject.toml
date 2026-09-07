@@ -1,18 +1,25 @@
 [project]
-name = "waisoft-reports"
+name = "horusops"
 version = "1.0.0"
-description = "Git Automation, Server Orchestration, CI/CD Engine & Telegram AI Control Center"
+description = "Autonomous Self-Healing DevOps Platform, Git Auto-Sync & AI Server Orchestrator via Telegram"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "WAISoft" }]
-keywords = ["git", "automation", "commit", "sync", "telegram-bot", "ci-cd", "server-manager"]
+authors = [{ name = "Muhammad Al-Shaikh", email = "muhammad.al-shaikh@outlook.com" }]
+keywords = ["devops", "self-healing", "git", "automation", "telegram-bot", "ci-cd", "server-manager", "infrastructure"]
 dependencies = [
     "requests>=2.28",
 ]
 
+[project.urls]
+Homepage = "https://github.com/ElShaikh1945/HorusOps"
+Repository = "https://github.com/ElShaikh1945/HorusOps"
+Issues = "https://github.com/ElShaikh1945/HorusOps/issues"
+"Telegram Support" = "https://t.me/HorusOps_chat"
+"Telegram News" = "https://t.me/HorusOps"
+
 [project.scripts]
-waisoft-reports = "git_auto_sync.cli:main"
+horusops = "git_auto_sync.cli:main"
 git-auto-sync = "git_auto_sync.cli:main"
 
 [build-system]

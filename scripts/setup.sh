@@ -6,7 +6,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
 
 echo "=================================================="
-echo "      WAISoft-Reports Setup Wizard"
+echo "      HorusOps Setup Wizard"
 echo "=================================================="
 
 # Check Python version

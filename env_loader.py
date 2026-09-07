@@ -1,4 +1,4 @@
-"""Environment variable loader for WAISoft-Reports / git-auto-sync.
+"""Environment variable loader for HorusOps / git-auto-sync.
 
 Checks in order:
 1. Custom path specified via ENV_PATH environment variable.

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="512" height="512" rx="48" fill="#0b1120" />
+
+  <!-- HorusOps Cloud-Eye Geometry -->
+  <g fill="none" stroke="#00d2ff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Cloud Base Enclosure -->
+    <path d="M 120 240 C 70 240 70 360 120 360 L 392 360 C 442 360 442 240 392 240" />
+
+    <!-- Eyebrow Bar -->
+    <path d="M 140 180 Q 256 140 372 180" />
+
+    <!-- Upper Eyelid -->
+    <path d="M 130 240 Q 256 160 382 240" />
+
+    <!-- Lower Eyelid -->
+    <path d="M 130 240 Q 256 300 382 240" />
+
+    <!-- Eye Pupil (Core Node) -->
+    <circle cx="256" cy="230" r="28" fill="#00d2ff" stroke="none" />
+    <circle cx="256" cy="230" r="10" fill="#0b1120" stroke="none" />
+
+    <!-- Vertical Falcon Mark / DevOps Drop -->
+    <path d="M 320 270 L 320 360 L 345 320" />
+
+    <!-- Spiral Tail (Wedjat Curl) -->
+    <path d="M 285 270 C 230 350 160 350 160 300 C 160 260 200 260 210 280 C 215 290 205 310 190 310" />
+  </g>
+</svg>

@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "      WAISoft-Reports Installation & Setup" -ForegroundColor Cyan
+Write-Host "      HorusOps Installation & Setup" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
