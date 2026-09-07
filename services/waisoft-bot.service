@@ -1,0 +1,16 @@
+[Unit]
+Description=WAISoft Reports Telegram Bot Daemon
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=__APP_DIR__
+ExecStart=/usr/bin/env python3 telegram_bot_daemon.py
+Restart=always
+RestartSec=5
+StandardOutput=append:__APP_DIR__/server_logs/bot_stdout.log
+StandardError=append:__APP_DIR__/server_logs/bot_stderr.log
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

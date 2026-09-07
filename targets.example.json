@@ -1,0 +1,31 @@
+{
+  "targets": {
+    "client_app": {
+      "title": "Client Android App (arm64 APK)",
+      "project": "mobile-app",
+      "app": "client",
+      "owner": "your-github-org",
+      "repo": "mobile-app-repo",
+      "workflow": "build-android.yml",
+      "branch": "main",
+      "inputs": {
+        "app": "client",
+        "build_type": "release"
+      },
+      "type": "apk"
+    },
+    "web_deploy": {
+      "title": "Web Production Deployment",
+      "project": "web-app",
+      "app": "frontend",
+      "owner": "your-github-org",
+      "repo": "web-app-repo",
+      "workflow": "deploy.yml",
+      "branch": "main",
+      "inputs": {
+        "environment": "production"
+      },
+      "type": "deploy"
+    }
+  }
+}

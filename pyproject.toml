@@ -1,0 +1,40 @@
+[project]
+name = "waisoft-reports"
+version = "1.0.0"
+description = "Git Automation, Server Orchestration, CI/CD Engine & Telegram AI Control Center"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "WAISoft" }]
+keywords = ["git", "automation", "commit", "sync", "telegram-bot", "ci-cd", "server-manager"]
+dependencies = [
+    "requests>=2.28",
+]
+
+[project.scripts]
+waisoft-reports = "git_auto_sync.cli:main"
+git-auto-sync = "git_auto_sync.cli:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["git_auto_sync*"]
+
+[tool.setuptools.package-data]
+git_auto_sync = ["prompts/*.md"]
+
+[dependency-groups]
+dev = ["pytest>=7.0", "ruff>=0.4"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]

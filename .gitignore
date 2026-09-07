@@ -1,0 +1,71 @@
+# Environments & Secrets
+.env
+.env.*
+!.env.example
+
+# Local Configurations (do not commit personalized server & target mappings)
+servers.json
+!servers.example.json
+targets.json
+!targets.example.json
+config.toml
+!config.example.toml
+
+# Logs & Runtime State
+*.log
+sync.log
+server_logs/
+artifacts/
+active_servers.json
+conversation_history.json
+last_errors.json
+actions_monitor_state.json
+local_activity_state.json
+remote_ahead_state.json
+bot_actions.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.ruff_cache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

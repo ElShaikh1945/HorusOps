@@ -1,0 +1,59 @@
+# Example config for git-auto-sync
+# Copy to ~/.git-auto-sync/config.toml and adjust as needed.
+
+[defaults]
+ai_provider            = "claude-cli"      # claude-cli | anthropic-api | rules
+ai_staging             = true              # AI picks from path-policy-approved files; false stages approved files
+ai_gitignore_autowrite = true              # when ai_staging is enabled, append ignored files into .gitignore
+push                   = true              # pull --rebase then push after commit
+notify_on              = "change_or_fail"  # change_or_fail | fail_only | always
+tracked_ignored_policy = "leave_dirty"     # leave_dirty | skip_worktree for ignored tracked files
+
+# ---- Repositories to sync, supports multiple entries ----
+[[repos]]
+path = "~/programming/foo"
+
+[[repos]]
+path = "~/programming/bar"
+push = false                               # can override any defaults field per repository
+
+# Optional path policy for any repo. In allowlist mode, only matching paths can
+# be staged automatically. Patterns use gitignore-style globs, not regex.
+[[repos]]
+path = "~/programming/docs"
+
+[repos.path_policy]
+mode = "allowlist"                         # all | allowlist
+include = ["README.md", "docs/**"]
+exclude = ["*.log", ".env*"]
+builtin_deny = true                        # blocks common secrets and credentials
+
+# Bare repository plus explicit work tree. This mode always requires an
+# allowlist path policy so broad work trees cannot be synced accidentally.
+[[repos]]
+name = "home-config"
+path = "~"
+git_dir = "~/.homegit.git"
+work_tree = "~"
+ai_staging = false
+
+[repos.path_policy]
+mode = "allowlist"
+include = [".zshrc", ".gitconfig"]
+# include_file = "~/.homegitinclude"
+exclude_file = "~/.homegitignore"
+builtin_deny = true
+
+# ---- Notifier channels (only entries with enabled=true are active) ----
+[notifiers.log]
+enabled = true
+path    = "~/.git-auto-sync/sync.log"
+
+[notifiers.telegram]
+enabled   = false
+bot_token = "env:TELEGRAM_BOT_TOKEN"       # env: prefix reads from environment variable and avoids plaintext secrets
+chat_id   = "123456"
+
+[notifiers.lark]
+enabled = false
+webhook = "https://open.feishu.cn/open-apis/bot/v2/hook/xxxx"
