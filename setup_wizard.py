@@ -18,8 +18,10 @@ import os
 import re
 import socket
 import socketserver
+import ssl
 import subprocess
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 import webbrowser
@@ -97,13 +99,23 @@ def write_env_file(path: Path, env_data: dict[str, str]) -> None:
         pass
 
 
+def safe_urlopen(req: urllib.request.Request, timeout: int = 10):
+    try:
+        return urllib.request.urlopen(req, timeout=timeout)
+    except urllib.error.URLError as e:
+        if "CERTIFICATE_VERIFY_FAILED" in str(e):
+            ctx = ssl._create_unverified_context()
+            return urllib.request.urlopen(req, timeout=timeout, context=ctx)
+        raise
+
+
 def test_telegram_token(token: str) -> dict:
     if not token:
         return {"ok": False, "error": "يرجى إدخال توكن البوت أولاً."}
     url = f"https://api.telegram.org/bot{token}/getMe"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "SetupWizard/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with safe_urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             if data.get("ok"):
                 user = data.get("result", {})
@@ -114,6 +126,12 @@ def test_telegram_token(token: str) -> dict:
                     "id": user.get("id"),
                 }
             return {"ok": False, "error": data.get("description", "Unknown error")}
+    except urllib.error.HTTPError as exc:
+        try:
+            d = json.loads(exc.read().decode("utf-8", errors="ignore"))
+            return {"ok": False, "error": d.get("description", f"HTTP {exc.code}")}
+        except Exception:
+            return {"ok": False, "error": f"HTTP {exc.code}: {exc.reason}"}
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -124,7 +142,7 @@ def detect_telegram_chat_id(token: str) -> dict:
     url = f"https://api.telegram.org/bot{token}/getUpdates?limit=20&offset=-10"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "SetupWizard/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with safe_urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             if not data.get("ok"):
                 return {"ok": False, "error": data.get("description", "Unknown error")}
@@ -150,6 +168,12 @@ def detect_telegram_chat_id(token: str) -> dict:
                 "ok": False,
                 "error": "تعذر استخراج معرّف مستخدم صالح من الرسائل الأخيرة. أرسل رسالة نصية جديدة للبوت ثم أعد المحاولة.",
             }
+    except urllib.error.HTTPError as exc:
+        try:
+            d = json.loads(exc.read().decode("utf-8", errors="ignore"))
+            return {"ok": False, "error": d.get("description", f"HTTP {exc.code}")}
+        except Exception:
+            return {"ok": False, "error": f"HTTP {exc.code}: {exc.reason}"}
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -166,10 +190,17 @@ def test_groq_key(key: str) -> dict:
                 "User-Agent": "SetupWizard/1.0",
             },
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with safe_urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             models = [m.get("id") for m in data.get("data", []) if m.get("id")]
             return {"ok": True, "models_count": len(models), "models": models[:6]}
+    except urllib.error.HTTPError as exc:
+        try:
+            d = json.loads(exc.read().decode("utf-8", errors="ignore"))
+            msg = d.get("error", {}).get("message") or d.get("description")
+            return {"ok": False, "error": msg or f"HTTP {exc.code}"}
+        except Exception:
+            return {"ok": False, "error": f"HTTP {exc.code}: {exc.reason}"}
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -187,13 +218,19 @@ def test_github_token(token: str) -> dict:
                 "Accept": "application/vnd.github.v3+json",
             },
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with safe_urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             return {
                 "ok": True,
                 "login": data.get("login", ""),
                 "name": data.get("name", ""),
             }
+    except urllib.error.HTTPError as exc:
+        try:
+            d = json.loads(exc.read().decode("utf-8", errors="ignore"))
+            return {"ok": False, "error": d.get("message", f"HTTP {exc.code}")}
+        except Exception:
+            return {"ok": False, "error": f"HTTP {exc.code}: {exc.reason}"}
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -403,29 +440,37 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
         except Exception:
             body = {}
 
-        if parsed.path == "/api/test/telegram":
-            res = test_telegram_token(body.get("token", "").strip())
+        if parsed.path in ("/api/test/telegram", "/api/validate/telegram"):
+            token = body.get("token") or body.get("bot_token") or ""
+            res = test_telegram_token(token.strip())
             self._send_json(200, res)
 
         elif parsed.path == "/api/detect/telegram_chat_id":
-            res = detect_telegram_chat_id(body.get("token", "").strip())
+            token = body.get("token") or body.get("bot_token") or ""
+            res = detect_telegram_chat_id(token.strip())
             self._send_json(200, res)
 
-        elif parsed.path == "/api/test/groq":
-            res = test_groq_key(body.get("key", "").strip())
+        elif parsed.path in ("/api/test/groq", "/api/validate/groq"):
+            key = body.get("key") or body.get("api_key") or ""
+            res = test_groq_key(key.strip())
             self._send_json(200, res)
 
-        elif parsed.path == "/api/test/github":
-            res = test_github_token(body.get("token", "").strip())
+        elif parsed.path in ("/api/test/github", "/api/validate/github"):
+            token = body.get("token") or body.get("github_token") or ""
+            res = test_github_token(token.strip())
             self._send_json(200, res)
 
         elif parsed.path == "/api/scan/repos":
-            paths = body.get("paths", [])
+            paths = body.get("paths") or body.get("base_dirs") or []
+            if isinstance(paths, str):
+                paths = [p.strip() for p in paths.split(",") if p.strip()]
             repos = scan_repositories_in_paths(paths)
             self._send_json(200, {"ok": True, "repos": repos, "count": len(repos)})
 
         elif parsed.path == "/api/scan/servers":
-            paths = body.get("paths", [])
+            paths = body.get("paths") or body.get("base_dirs") or []
+            if isinstance(paths, str):
+                paths = [p.strip() for p in paths.split(",") if p.strip()]
             servers = auto_scan_servers_in_paths(paths)
             self._send_json(200, {"ok": True, "servers": servers, "count": len(servers)})
 
@@ -1267,7 +1312,10 @@ def main():
     args = parser.parse_args()
 
     if args.cli:
-        run_cli_wizard()
+        try:
+            run_cli_wizard()
+        except (KeyboardInterrupt, EOFError):
+            print("\n\n[INFO] تم إنهاء معالج الإعداد التفاعلي.")
         return
 
     port = get_free_port(args.port)
