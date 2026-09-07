@@ -66,9 +66,21 @@ def is_bot_action(action_type: str, repo_name: str, commit_hash: str) -> bool:
         return False
 
 
+def get_base_dirs() -> list[Path]:
+    raw = os.environ.get("SYNC_BASE_DIR", str(Path.home() / "projects"))
+    dirs = []
+    for p in raw.split(","):
+        p = p.strip()
+        if p:
+            dirs.append(Path(p).expanduser())
+    return dirs or [Path(str(Path.home() / "projects")).expanduser()]
+
+
 def check_environment() -> tuple[bool, str]:
-    if not BASE_DIR.exists() or not BASE_DIR.is_dir():
-        return False, f"المسار {BASE_DIR} غير متاح أو القرص غير موصول."
+    base_dirs = get_base_dirs()
+    existing = [d for d in base_dirs if d.exists() and d.is_dir()]
+    if not existing:
+        return False, f"المسارات المحددة {base_dirs} غير متاحة أو القرص غير موصول."
 
     try:
         r = requests.head("https://github.com", timeout=4)
@@ -81,12 +93,17 @@ def check_environment() -> tuple[bool, str]:
 
 
 def discover_repos() -> list[Path]:
-    if not BASE_DIR.exists():
-        return []
     repos = []
-    for d in sorted(BASE_DIR.iterdir()):
-        if d.is_dir() and d.name not in IGNORED_NAMES and (d / ".git").exists():
-            repos.append(d.resolve())
+    seen = set()
+    for base in get_base_dirs():
+        if not base.exists() or not base.is_dir():
+            continue
+        for d in sorted(base.iterdir()):
+            if d.is_dir() and d.name not in IGNORED_NAMES and (d / ".git").exists():
+                r_resolved = d.resolve()
+                if str(r_resolved) not in seen:
+                    seen.add(str(r_resolved))
+                    repos.append(r_resolved)
     return repos
 
 

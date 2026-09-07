@@ -15,6 +15,10 @@ if ! command -v python3 &>/dev/null; then
     exit 1
 fi
 
+if [[ "$*" == *"--cli"* ]] || [[ "$*" == *"-c"* ]]; then
+    exec python3 setup_wizard.py "$@"
+fi
+
 PORT="${SETUP_PORT:-8585}"
 URL="http://localhost:${PORT}"
 
@@ -29,4 +33,4 @@ elif command -v xdg-open &>/dev/null; then
     (sleep 1 && xdg-open "$URL") &
 fi
 
-exec python3 setup_wizard.py --port "$PORT"
+exec python3 setup_wizard.py --port "$PORT" "$@"
