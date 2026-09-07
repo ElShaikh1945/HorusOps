@@ -68,20 +68,21 @@ git clone https://github.com/your-username/WAISoft-Reports.git
 cd WAISoft-Reports
 ```
 
-### 2. Launch the Web Setup Wizard
-Run the setup script to configure your environment:
+### 2. Run Setup (One-Step Installer)
+Run the installer script (automatically verifies dependencies and launches the setup wizard):
 ```bash
-./scripts/setup.sh
+./install.sh
 ```
-Or run directly with Python:
-```bash
-python3 setup_wizard.py --port 8585
-```
+> **For VPS / Headless servers**: Run with `--cli` for an interactive terminal onboarding:
+> ```bash
+> ./install.sh --cli
+> ```
+
 Open **`http://localhost:8585`** in your browser:
-1. Enter your **Telegram Bot Token** & **Chat ID** and click **Test Telegram**.
-2. Enter your **Groq API Key** and click **Test Groq**.
-3. (Optional) Enter your **GitHub Token** and click **Test GitHub**.
-4. Configure your base repository path, servers, and CI/CD targets.
+1. **Telegram Bot Token**: Paste your token from `@BotFather` and click **Auto-Detect ID** (or send any message to your bot on Telegram).
+2. **Projects Directory**: Click **Browse Folder...** to choose your repository root (supports multiple paths separated by comma).
+3. **Local Servers**: Click **Auto-Discover Servers** to automatically detect your local development servers (Next.js, Vite, FastAPI, etc.).
+4. (Optional) Enter your **Groq API Key** for AI diagnostic reports and **GitHub Token** for CI/CD.
 5. Click **Save Settings**.
 
 ---
