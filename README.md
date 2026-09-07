@@ -56,7 +56,7 @@ Whether you manage multiple development repositories, run background Next.js / N
   - Test Groq API Key (`models.list` API check)
   - Test GitHub Token (`/user` API check)
 - Edit and save `.env`, `servers.json`, and `targets.json` directly from your browser.
-- One-click daemon launcher directly from the web interface.
+- Dedicated configuration onboarding: no process management or control overhead in the web layer.
 
 ---
 

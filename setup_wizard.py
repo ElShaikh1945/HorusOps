@@ -230,21 +230,7 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
                 with open(TARGETS_FILE, "w", encoding="utf-8") as f:
                     json.dump({"targets": targets_in}, f, ensure_ascii=False, indent=2)
 
-                self._send_json(200, {"ok": True, "message": "تم حفظ كافة الإعدادات بنجاح في .env و servers.json و targets.json!"})
-            except Exception as exc:
-                self._send_json(500, {"ok": False, "error": str(exc)})
-
-        elif parsed.path == "/api/start_bot":
-            try:
-                bot_script = ROOT_DIR / "telegram_bot_daemon.py"
-                proc = subprocess.Popen(
-                    [sys.executable, str(bot_script)],
-                    cwd=str(ROOT_DIR),
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    start_new_session=True,
-                )
-                self._send_json(200, {"ok": True, "pid": proc.pid, "message": f"تم إطلاق ديمون البوت بنجاح في الخلفية (PID: {proc.pid})"})
+                self._send_json(200, {"ok": True, "message": "تم حفظ الإعدادات بنجاح في .env و servers.json و targets.json. يمكنك الآن تشغيل البوت عبر: ./scripts/run_bot.sh"})
             except Exception as exc:
                 self._send_json(500, {"ok": False, "error": str(exc)})
         else:
@@ -280,21 +266,18 @@ HTML_PAGE = """<!DOCTYPE html>
     <header class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-6">
       <div>
         <div class="flex items-center gap-3">
-          <span class="px-2.5 py-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-mono text-xs font-bold">[SYS]</span>
+          <span class="px-2.5 py-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-mono text-xs font-bold">[CONFIG]</span>
           <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
-            WAISoft-Reports | لوحة إعدادات النظام
+            WAISoft-Reports | معالج تهيئة إعدادات البوت
           </h1>
         </div>
         <p class="text-sm text-slate-400 mt-1">
-          واجهة تهيئة مفتوحة المصدر لإدارة المستودعات، المزامنة، الخوادم، وبوت تيليجرام.
+          أداة لتهيئة وتوليد ملفات الضبط (.env و servers.json و targets.json). يتم تشغيل البوت وإدارته بالكامل من سطر الأوامر وتيليجرام.
         </p>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="saveTopBtn" onclick="saveAllConfig()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 font-semibold rounded-lg shadow-lg shadow-blue-600/20 transition flex items-center gap-2 text-sm">
-          [حفظ الإعدادات]
-        </button>
-        <button id="startBotTopBtn" onclick="startBotDaemon()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 font-semibold rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center gap-2 text-sm">
-          [تشغيل البوت]
+      <div>
+        <button id="saveTopBtn" onclick="saveAllConfig()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 font-semibold rounded-lg shadow-lg shadow-blue-600/20 transition flex items-center gap-2 text-sm">
+          [حفظ ملفات الإعدادات]
         </button>
       </div>
     </header>
@@ -416,10 +399,10 @@ HTML_PAGE = """<!DOCTYPE html>
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
-              إدارة الخوادم المحلية للمشاريع
+              تعريف الخوادم ومنافذ المشاريع
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              عرّف خدمات مشاريعك ليتمكن البوت من تشغيلها، إيقافها، حل تعارض بورتاتها، وتشخيص أخطائها.
+              تعريف الخوادم ومنافذها ليتعرف عليها البوت لمراقبتها في التقارير (تُحفظ في servers.json). هذه الصفحة للتهيئة فقط ولا تقوم بتشغيل أي خدمات.
             </p>
           </div>
           <button onclick="addServerCard()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded-lg transition flex items-center gap-1.5">
@@ -439,10 +422,10 @@ HTML_PAGE = """<!DOCTYPE html>
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
-              أهداف البناء ومراقبة GitHub Actions
+              تعريف أهداف البناء (CI/CD Targets)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              اربط الـ Workflows ليقوم البوت ببنائها وتحميل ملفات الـ APK مباشرة إليك في تيليجرام.
+              تعريف مستهدفات البناء وخطوط سير العمل ليتعرف عليها البوت عند طلب البناء (تُحفظ في targets.json).
             </p>
           </div>
           <button onclick="addTargetCard()" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-xs font-bold rounded-lg transition flex items-center gap-1.5">
@@ -453,6 +436,20 @@ HTML_PAGE = """<!DOCTYPE html>
         <div id="targetsContainer" class="space-y-4">
           <!-- Target cards inserted dynamically -->
         </div>
+      </div>
+    </div>
+
+    <!-- Instructions Box -->
+    <div class="mt-8 bg-slate-800/40 border border-slate-700/40 rounded-xl p-5 text-xs text-slate-400 space-y-2">
+      <div class="font-bold text-slate-300 text-sm">[INFO] طريقة تشغيل وإدارة البوت بعد حفظ الإعدادات:</div>
+      <p>هذا المعالج مخصص فقط لتوليد وضبط ملفات الإعدادات (<code class="text-blue-400 font-mono">.env</code> و <code class="text-emerald-400 font-mono">servers.json</code> و <code class="text-amber-400 font-mono">targets.json</code>).</p>
+      <p>بعد الضغط على [حفظ ملفات الإعدادات]، يتم تشغيل البوت وإدارته من خلال سطر الأوامر أو كخدمة خلفية:</p>
+      <div class="bg-slate-950/80 p-3 rounded font-mono text-slate-300 text-xs space-y-1">
+        <div># تشغيل البوت مباشرة:</div>
+        <div class="text-emerald-400">./scripts/run_bot.sh</div>
+        <div class="pt-2"># أو تثبيته كخدمة تعمل تلقائياً في خلفية النظام:</div>
+        <div class="text-blue-400">./scripts/install_launchd.sh   # macOS</div>
+        <div class="text-blue-400">./scripts/install_systemd.sh   # Linux</div>
       </div>
     </div>
 
@@ -764,20 +761,6 @@ HTML_PAGE = """<!DOCTYPE html>
         }
       } catch (err) {
         showToast("تعذر الاتصال بالخادم: " + err, true);
-      }
-    }
-
-    async function startBotDaemon() {
-      try {
-        const res = await fetch("/api/start_bot", { method: "POST" });
-        const data = await res.json();
-        if (data.ok) {
-          showToast(data.message);
-        } else {
-          showToast("فشل إطلاق البوت: " + data.error, true);
-        }
-      } catch (err) {
-        showToast("خطأ: " + err, true);
       }
     }
 
