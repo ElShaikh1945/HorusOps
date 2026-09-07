@@ -182,6 +182,13 @@ def commit_local_changes_if_dirty(repo: Path) -> tuple[bool, str]:
     if add_res.returncode != 0:
         return False, f"فشل تجهيز الملفات (git add): {add_res.stderr.strip()}"
 
+    # Safety safeguard: unstage accidental secret/credential files if omitted from .gitignore
+    subprocess.run(
+        ["git", "-C", str(repo), "reset", "HEAD", "--", "*.env", ".env.*", "*.pem", "*.key", "id_rsa*", "*.p12", "*.secret"],
+        capture_output=True,
+        check=False,
+    )
+
     # Verify if staged changes exist
     diff_res = subprocess.run(
         ["git", "-C", str(repo), "diff", "--cached", "--name-only"],

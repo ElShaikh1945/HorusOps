@@ -396,23 +396,28 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
+    def _is_safe_host(self) -> bool:
+        host = self.headers.get("Host", "").split(":")[0].strip().lower()
+        return host in ("localhost", "127.0.0.1", "::1", "")
+
     def _send_json(self, status_code: int, data: dict):
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("X-Content-Type-Options", "nosniff")
         self.end_headers()
         self.wfile.write(body)
 
     def do_OPTIONS(self):
         self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
     def do_GET(self):
+        if not self._is_safe_host():
+            self.send_error(403, "Forbidden")
+            return
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == "/":
             self.serve_html()
@@ -432,6 +437,9 @@ class SetupRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(404, "Not Found")
 
     def do_POST(self):
+        if not self._is_safe_host():
+            self.send_error(403, "Forbidden")
+            return
         parsed = urllib.parse.urlparse(self.path)
         length = int(self.headers.get("Content-Length", 0))
         raw_body = self.rfile.read(length).decode("utf-8") if length > 0 else "{}"
@@ -1117,6 +1125,7 @@ HTML_PAGE = """<!DOCTYPE html>
     async function saveAllConfig() {
       const env = {
         TELEGRAM_BOT_TOKEN: document.getElementById("tgToken").value.trim(),
+        TELEGRAM_USER_ID: document.getElementById("tgUserId").value.trim(),
         TELEGRAM_CHAT_ID: document.getElementById("tgUserId").value.trim(),
         TELEGRAM_ADMIN_IDS: document.getElementById("tgUserId").value.trim(),
         GROQ_API_KEY: document.getElementById("groqKey").value.trim(),
@@ -1274,6 +1283,7 @@ def run_cli_wizard():
     # Save
     new_env = {
         "TELEGRAM_BOT_TOKEN": token,
+        "TELEGRAM_USER_ID": user_id,
         "TELEGRAM_CHAT_ID": user_id,
         "TELEGRAM_ADMIN_IDS": user_id,
         "GROQ_API_KEY": groq_key,

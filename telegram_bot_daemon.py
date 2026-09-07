@@ -30,7 +30,22 @@ from env_loader import load_env
 
 env = load_env()
 BOT_TOKEN = env.get("TELEGRAM_BOT_TOKEN", "")
-AUTHORIZED_USER_ID = int(env.get("TELEGRAM_USER_ID", "0"))
+
+# Parse authorized user IDs supporting TELEGRAM_USER_ID, TELEGRAM_ADMIN_IDS, and TELEGRAM_CHAT_ID
+raw_user_ids = env.get("TELEGRAM_USER_ID", "") or env.get("TELEGRAM_ADMIN_IDS", "") or env.get("TELEGRAM_CHAT_ID", "")
+AUTHORIZED_USER_IDS: set[int] = set()
+for uid in str(raw_user_ids).split(","):
+    uid_clean = uid.strip()
+    if uid_clean.isdigit():
+        AUTHORIZED_USER_IDS.add(int(uid_clean))
+
+AUTHORIZED_USER_ID = next(iter(AUTHORIZED_USER_IDS)) if AUTHORIZED_USER_IDS else 0
+
+def is_authorized(from_id: int | None) -> bool:
+    if not from_id or not AUTHORIZED_USER_IDS:
+        return False
+    return from_id in AUTHORIZED_USER_IDS
+
 GROQ_API_KEY = env.get("GROQ_API_KEY", "")
 GROQ_MODEL = env.get("GROQ_MODEL", "qwen/qwen3.8-27b")
 
@@ -1914,7 +1929,7 @@ def process_callback_query(query: dict) -> None:
     menu_msg_id = message.get("message_id")
     data = query.get("data", "")
 
-    if from_id != AUTHORIZED_USER_ID:
+    if not is_authorized(from_id):
         answer_callback_query(query_id, "[ACCESS DENIED] غير مصرح.")
         return
 
@@ -1949,7 +1964,7 @@ def process_message(msg: dict) -> None:
     raw_text = (msg.get("text") or "").strip()
     text = raw_text.lower()
 
-    if from_id != AUTHORIZED_USER_ID:
+    if not is_authorized(from_id):
         log(f"Unauthorized message from user {from_id}: {raw_text}")
         if chat_id:
             send_telegram(chat_id, "[ACCESS DENIED] غير مصرح.")
@@ -2038,7 +2053,7 @@ def process_inline_query(iq: dict) -> None:
     raw_query = (iq.get("query") or "").strip().lower()
     from_id = iq.get("from", {}).get("id")
 
-    if from_id != AUTHORIZED_USER_ID:
+    if not is_authorized(from_id):
         return
 
     results = []
